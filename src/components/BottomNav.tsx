@@ -1,0 +1,38 @@
+import { NavLink } from 'react-router-dom'
+import { Home, Calendar, Droplets, Table, FileText } from 'lucide-react'
+
+const tabs = [
+  { to: '/', label: 'Hem', Icon: Home },
+  { to: '/schema', label: 'Schema', Icon: Calendar },
+  { to: '/logg', label: 'Logg', Icon: Droplets },
+  { to: '/kalkyl', label: 'Kalkyl', Icon: Table },
+  { to: '/noteringar', label: 'Noteringar', Icon: FileText },
+] as const
+
+export function BottomNav() {
+  return (
+    <nav className="fixed bottom-0 inset-x-0 bg-navy/95 backdrop-blur-md border-t border-glass-border safe-area-pb">
+      <div className="flex justify-around max-w-md mx-auto">
+        {tabs.map(({ to, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-2 transition-colors duration-200 ${
+                isActive ? 'text-gold' : 'text-slate-500'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[10px] mt-1 ${isActive ? 'font-semibold' : ''}`}>{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </div>
+    </nav>
+  )
+}
