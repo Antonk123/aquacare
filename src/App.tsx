@@ -1,7 +1,25 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Layout } from './components/Layout'
+import Dashboard from './pages/Dashboard'
+import Schedule from './pages/Schedule'
+import WaterLog from './pages/WaterLog'
+import WaterLogForm from './pages/WaterLogForm'
+import Calculator from './pages/Calculator'
+import Notes from './pages/Notes'
+
 export default function App() {
   return (
-    <div className="min-h-dvh flex items-center justify-content-center">
-      <h1 className="font-display text-2xl text-gold text-center w-full">AquaCare</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="schema" element={<Schedule />} />
+          <Route path="logg" element={<WaterLog />} />
+          <Route path="logg/ny" element={<WaterLogForm />} />
+          <Route path="kalkyl" element={<Calculator />} />
+          <Route path="noteringar" element={<Notes />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }

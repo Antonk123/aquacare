@@ -4,7 +4,6 @@ import type {
   OptimalRange,
   CalculatorFormula,
   ValueStatus,
-  WaterLogEntry,
 } from './types'
 
 export const DEFAULT_SETTINGS = {
