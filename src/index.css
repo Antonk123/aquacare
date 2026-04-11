@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --color-navy: #0a1628;
+  --color-navy-light: #111d33;
+  --color-gold: #E8C97A;
+  --color-gold-dark: #d4a855;
+  --color-status-ok: #4ade80;
+  --color-status-warn: #fbbf24;
+  --color-status-error: #f87171;
+  --color-status-alert: #fb923c;
+  --color-glass-surface: rgba(232,201,122,0.07);
+  --color-glass-border: rgba(232,201,122,0.12);
+  --font-family-display: 'Playfair Display', serif;
+  --font-family-body: 'DM Sans', sans-serif;
+}
+
+body {
+  @apply bg-navy text-slate-200 antialiased;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
