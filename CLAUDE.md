@@ -63,10 +63,28 @@ src/
 - `aquacare_settings` — Settings
 - `aquacare_streak` — StreakData
 
+## Obsidian Vault — Second Brain
+
+Obsidian-vaultet är den centrala kunskapsbasen ("second brain") för alla projekt.
+
+- **Vault:** `/Users/anton/Library/CloudStorage/OneDrive-Prefabmästarna/Dokument/Projekt/Obsidian/`
+- **Struktur:** `Projekt/Aquacare/` (t.ex. `Projekt/Aquacare/SUMMARY.md`)
+- **Mallar:** `Mallar/` i vault-rooten
+
+### Regler
+
+1. **Kolla vaultet först:** Innan du svarar på eller ställer frågor om projektet — läs relevant dokumentation i vaultet. Börja med `Projekt/Aquacare/` för att se vad som finns.
+2. **Skriv dokumentation hit:** Projektdokumentation, sammanfattningar och beslut skrivs till vaultet, inte i kodrepot.
+3. **GSD-planer och CLAUDE.md** ligger kvar i kodrepot — de behövs där.
+4. **SUMMARY.md** i Obsidian uppdateras vid milstolpe-gränser, inte varje session.
+5. **Lokal vs server-åtkomst:**
+   - **Lokalt (Mac):** Läs/skriv direkt via filsökvägen. Rör INTE git i vaultet — synkas automatiskt via OneDrive + Obsidian Git-plugin.
+   - **Server:** Ingen lokal sökväg finns — använd git. Kör `git pull` innan läsning och `git add . && git commit -m "vault update" && git push` efter skrivning.
+
 ## Konventioner
 - UI-text på svenska, kod på engelska
 - Alla designbeslut valideras med /ui-ux-pro-max
-- Dokumentation skrivs till Obsidian-vaultet (`Projekt/Aquacare/`), inte i repot
+- Dokumentation skrivs till Obsidian-vaultet (se ovan), inte i repot
 - Obsidian SUMMARY.md uppdateras automatiskt efter milstolpar
 
 ## Spa-detaljer (defaults)
