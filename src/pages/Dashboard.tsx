@@ -9,9 +9,8 @@ import type { ValueStatus } from '../types'
 
 export default function Dashboard() {
   const { entries, streak } = useWaterLog()
-  const { getProgress, state: scheduleState } = useSchedule()
+  const { state: scheduleState } = useSchedule()
   const latest = entries[0]
-  const dailyProgress = getProgress('daily')
   const nextTask = SCHEDULE_TASKS.daily.find((t) => !scheduleState.daily[t.id])
 
   function getOverallStatus(): ValueStatus {

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
-import { GlassCard } from '../components/GlassCard'
 import { ProgressRing } from '../components/ProgressRing'
 import { useSchedule } from '../hooks/useSchedule'
 import { SCHEDULE_TASKS, PERIOD_LABELS } from '../constants'

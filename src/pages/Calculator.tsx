@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown, Calculator as CalcIcon } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
-import { CALCULATOR_FORMULAS, DEFAULT_SETTINGS, formatSwedishDecimal } from '../constants'
+import { CALCULATOR_FORMULAS, DEFAULT_SETTINGS } from '../constants'
 import type { CalculatorAction } from '../types'
 
 export default function Calculator() {
