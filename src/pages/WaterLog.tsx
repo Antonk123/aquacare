@@ -94,6 +94,9 @@ export default function WaterLog() {
                     </span>
                   )}
                 </div>
+                {entry.note && (
+                  <p className="text-xs text-slate-400 italic mb-2">{entry.note}</p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {OPTIMAL_RANGES.map((range) => {
                     const val = entry[range.key] as number | undefined
