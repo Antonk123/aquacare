@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Plus, Info, Check, AlertTriangle } from 'lucide-react'
+import { Plus, Info, Check, AlertTriangle, Trash2 } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { ValueBadge } from '../components/ValueBadge'
 import { useWaterLog } from '../hooks/useWaterLog'
@@ -20,7 +20,7 @@ function formatDate(iso: string): string {
 }
 
 export default function WaterLog() {
-  const { entries } = useWaterLog()
+  const { entries, deleteEntry } = useWaterLog()
 
   function getEntryStatus(entry: typeof entries[0]): { status: ValueStatus; warnings: number } {
     let warnings = 0
@@ -82,6 +82,7 @@ export default function WaterLog() {
               <GlassCard key={entry.id} className="!bg-glass-surface/70">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[13px] text-slate-300 font-semibold">{formatDate(entry.date)}</span>
+                  <div className="flex items-center gap-2">
                   {status === 'ok' ? (
                     <span className="inline-flex items-center gap-1 bg-status-ok/12 text-status-ok text-[10px] px-2 py-0.5 rounded-lg font-semibold">
                       <Check size={10} strokeWidth={3} />
@@ -93,6 +94,14 @@ export default function WaterLog() {
                       {warnings} varning{warnings > 1 ? 'ar' : ''}
                     </span>
                   )}
+                  <button
+                    onClick={() => deleteEntry(entry.id)}
+                    className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg transition-colors duration-200 active:scale-95"
+                    aria-label="Ta bort loggning"
+                  >
+                    <Trash2 size={14} className="text-slate-600" />
+                  </button>
+                  </div>
                 </div>
                 {entry.note && (
                   <p className="text-xs text-slate-400 italic mb-2">{entry.note}</p>

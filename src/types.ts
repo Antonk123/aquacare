@@ -39,7 +39,12 @@ export interface Settings {
 
 export interface StreakData {
   currentStreak: number
+  bestStreak: number
   lastLogDate: string
+}
+
+export interface WaterChangeData {
+  lastChange: string
 }
 
 export type SchedulePeriod = 'daily' | 'weekly' | 'monthly' | 'quarterly'

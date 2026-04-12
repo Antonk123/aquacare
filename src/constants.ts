@@ -169,10 +169,13 @@ export const TEST_STRIP_STEPS = [
   TEST_STRIP_COLORS.totalAlkalinity,
 ] as const
 
+export const WATER_CHANGE_CYCLE_DAYS = 90
+
 export const STORAGE_KEYS = {
   waterLog: 'aquacare_water_log',
   schedule: 'aquacare_schedule',
   notes: 'aquacare_notes',
   settings: 'aquacare_settings',
   streak: 'aquacare_streak',
+  waterChange: 'aquacare_water_change',
 } as const

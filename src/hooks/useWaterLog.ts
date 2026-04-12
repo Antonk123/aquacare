@@ -7,6 +7,7 @@ export function useWaterLog() {
   const [entries, setEntries] = useLocalStorage<WaterLogEntry[]>(STORAGE_KEYS.waterLog, [])
   const [streak, setStreak] = useLocalStorage<StreakData>(STORAGE_KEYS.streak, {
     currentStreak: 0,
+    bestStreak: 0,
     lastLogDate: '',
   })
 
@@ -24,7 +25,8 @@ export function useWaterLog() {
       setStreak((prev) => {
         if (prev.lastLogDate === today) return prev
         const newStreak = prev.lastLogDate === yesterday ? prev.currentStreak + 1 : 1
-        return { currentStreak: newStreak, lastLogDate: today }
+        const bestStreak = Math.max(prev.bestStreak ?? 0, newStreak)
+        return { currentStreak: newStreak, bestStreak, lastLogDate: today }
       })
 
       return newEntry

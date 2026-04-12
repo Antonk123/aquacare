@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { Pipette, ChevronLeft } from 'lucide-react'
 import { GlassCard } from './GlassCard'
-import { TEST_STRIP_STEPS, formatSwedishDecimal } from '../constants'
+import { TEST_STRIP_STEPS, OPTIMAL_RANGES, formatSwedishDecimal } from '../constants'
+
+function isOptimal(key: string, value: number): boolean {
+  const range = OPTIMAL_RANGES.find((r) => r.key === key)
+  if (!range) return false
+  const aboveMin = range.min === undefined || value >= range.min
+  const belowMax = range.max === undefined || value <= range.max
+  return aboveMin && belowMax
+}
 
 interface StripReaderResult {
   freeChlorine: number
@@ -75,36 +83,55 @@ export function StripReader({ onComplete, onCancel }: {
       </div>
 
       {/* Current step */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-1">
         <div className="text-sm text-slate-200 font-medium">{current.label}</div>
         <div className="text-[11px] text-slate-400 mt-0.5">
           Välj den färg som matchar din teststicka
         </div>
       </div>
 
+      {/* Optimal range hint */}
+      {(() => {
+        const range = OPTIMAL_RANGES.find((r) => r.key === current.key)
+        if (!range) return null
+        const min = range.min !== undefined ? formatSwedishDecimal(range.min) : null
+        const max = range.max !== undefined ? formatSwedishDecimal(range.max) : null
+        return (
+          <div className="text-center text-[11px] text-status-ok mb-3">
+            Optimalt: {min && max ? `${min}–${max}` : max ? `< ${max}` : `> ${min}`}
+            {current.unit ? ` ${current.unit}` : ''}
+          </div>
+        )
+      })()}
+
       {/* Color swatches */}
       <div className="flex justify-center gap-2 flex-wrap mb-3">
-        {current.values.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            onClick={() => handleSelect(item.value)}
-            className={`flex flex-col items-center gap-1.5 transition-transform duration-150 active:scale-95`}
-          >
-            <div
-              className={`w-[48px] h-[48px] rounded-xl border-2 transition-all duration-200 ${
-                selected[step] === item.value
-                  ? 'border-gold ring-2 ring-gold ring-offset-2 ring-offset-navy scale-110'
-                  : 'border-white/20'
-              }`}
-              style={{ backgroundColor: item.color }}
-            />
-            <span className="text-[10px] text-slate-400 font-medium">
-              {formatSwedishDecimal(item.value)}
-              {current.unit ? ` ${current.unit}` : ''}
-            </span>
-          </button>
-        ))}
+        {current.values.map((item) => {
+          const optimal = isOptimal(current.key, item.value)
+          return (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => handleSelect(item.value)}
+              className="flex flex-col items-center gap-1 transition-transform duration-150 active:scale-95"
+            >
+              <div
+                className={`w-[48px] h-[48px] rounded-xl border-2 transition-all duration-200 ${
+                  selected[step] === item.value
+                    ? 'border-gold ring-2 ring-gold ring-offset-2 ring-offset-navy scale-110'
+                    : optimal
+                      ? 'border-status-ok/50'
+                      : 'border-white/20'
+                }`}
+                style={{ backgroundColor: item.color }}
+              />
+              <span className={`text-[10px] font-medium ${optimal ? 'text-status-ok' : 'text-slate-400'}`}>
+                {formatSwedishDecimal(item.value)}
+                {current.unit ? ` ${current.unit}` : ''}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Step count */}
