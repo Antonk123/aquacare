@@ -1,6 +1,6 @@
 services:
   aquacare:
-    build: .
+    image: ghcr.io/antonk123/aquacare:latest
     container_name: aquacare
     restart: unless-stopped
     ports:
