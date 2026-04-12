@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Pipette } from 'lucide-react'
 import { useWaterLog } from '../hooks/useWaterLog'
+import { StripReader } from '../components/StripReader'
 
 interface FormField {
   key: string
@@ -23,6 +24,7 @@ export default function WaterLogForm() {
   const navigate = useNavigate()
   const { addEntry } = useWaterLog()
   const [values, setValues] = useState<Record<string, string>>({})
+  const [showStrip, setShowStrip] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -52,6 +54,30 @@ export default function WaterLogForm() {
         <h1 className="font-display text-xl text-gold font-bold">Ny loggning</h1>
       </div>
 
+      {showStrip ? (
+        <StripReader
+          onComplete={(vals) => {
+            setValues((prev) => ({
+              ...prev,
+              freeChlorine: String(vals.freeChlorine).replace('.', ','),
+              ph: String(vals.ph).replace('.', ','),
+              totalAlkalinity: String(vals.totalAlkalinity),
+            }))
+            setShowStrip(false)
+          }}
+          onCancel={() => setShowStrip(false)}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowStrip(true)}
+          className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gold/10 border border-gold/20 text-gold rounded-xl font-semibold text-[13px] transition-all duration-200 active:scale-[0.98]"
+        >
+          <Pipette size={16} strokeWidth={2.5} />
+          Avläs teststicka
+        </button>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           {FIELDS.map((field) => (
@@ -63,7 +89,7 @@ export default function WaterLogForm() {
                 placeholder={field.placeholder}
                 value={values[field.key] ?? ''}
                 onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
               />
             </div>
           ))}

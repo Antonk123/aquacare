@@ -43,7 +43,7 @@ export default function Schedule() {
             <button
               key={task.id}
               onClick={() => toggleTask(activePeriod, task.id)}
-              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 transition-colors duration-200 border ${
+              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 transition-all duration-200 active:scale-[0.98] border ${
                 done
                   ? 'bg-status-ok/6 border-status-ok/15'
                   : 'bg-glass-surface border-glass-border'

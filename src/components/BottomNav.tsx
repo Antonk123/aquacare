@@ -11,7 +11,7 @@ const tabs = [
 
 export function BottomNav() {
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-navy/95 backdrop-blur-md border-t border-glass-border safe-area-pb">
+    <nav className="fixed bottom-0 inset-x-0 bg-navy/95 backdrop-blur-md border-t border-glass-border safe-area-pb z-50">
       <div className="flex justify-around max-w-md mx-auto">
         {tabs.map(({ to, label, Icon }) => (
           <NavLink
@@ -19,8 +19,8 @@ export function BottomNav() {
             to={to}
             end={to === '/'}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-2 transition-colors duration-200 ${
-                isActive ? 'text-gold' : 'text-slate-500'
+              `flex flex-col items-center justify-center min-w-[48px] min-h-[48px] py-2 transition-colors duration-200 active:scale-95 ${
+                isActive ? 'text-gold' : 'text-slate-400'
               }`
             }
           >

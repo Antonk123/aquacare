@@ -70,7 +70,7 @@ export const CALCULATOR_FORMULAS: CalculatorFormula[] = [
     label: 'Höja pH',
     product: 'Natriumkarbonat (pH+)',
     unit: 'g',
-    dosagePerUnit: 15,
+    dosagePerUnit: 10,
     changeStep: 0.1,
     instruction: 'Tillsätt gradvis med jetsen igång. Testa igen efter 2 timmar.',
   },
@@ -88,7 +88,7 @@ export const CALCULATOR_FORMULAS: CalculatorFormula[] = [
     label: 'Höja alkalinitet',
     product: 'Natriumbikarbonat',
     unit: 'g',
-    dosagePerUnit: 17,
+    dosagePerUnit: 15,
     changeStep: 10,
     instruction: 'Lös upp i en hink vatten först. Tillsätt med pumpen igång.',
   },
@@ -120,6 +120,54 @@ export const CALCULATOR_FORMULAS: CalculatorFormula[] = [
     instruction: 'Lös upp i vatten först. Tillsätt med pumpen igång.',
   },
 ]
+
+export const TEST_STRIP_COLORS = {
+  freeChlorine: {
+    label: 'Fritt klor',
+    unit: 'ppm',
+    key: 'freeChlorine' as const,
+    values: [
+      { value: 0, color: '#F5F0E0' },
+      { value: 0.5, color: '#F5E0D0' },
+      { value: 1, color: '#F0C4B0' },
+      { value: 2, color: '#E8A0A0' },
+      { value: 3, color: '#D07080' },
+      { value: 5, color: '#C05070' },
+      { value: 10, color: '#A03060' },
+    ],
+  },
+  ph: {
+    label: 'pH',
+    unit: '',
+    key: 'ph' as const,
+    values: [
+      { value: 6.2, color: '#D4A030' },
+      { value: 6.8, color: '#D07040' },
+      { value: 7.2, color: '#C86050' },
+      { value: 7.8, color: '#C04060' },
+      { value: 8.4, color: '#A03058' },
+    ],
+  },
+  totalAlkalinity: {
+    label: 'Alkalinitet',
+    unit: 'ppm',
+    key: 'totalAlkalinity' as const,
+    values: [
+      { value: 0, color: '#D4C850' },
+      { value: 40, color: '#A0B848' },
+      { value: 80, color: '#70A040' },
+      { value: 120, color: '#C09030' },
+      { value: 180, color: '#C06030' },
+      { value: 240, color: '#903020' },
+    ],
+  },
+} as const
+
+export const TEST_STRIP_STEPS = [
+  TEST_STRIP_COLORS.freeChlorine,
+  TEST_STRIP_COLORS.ph,
+  TEST_STRIP_COLORS.totalAlkalinity,
+] as const
 
 export const STORAGE_KEYS = {
   waterLog: 'aquacare_water_log',

@@ -90,7 +90,7 @@ export default function Calculator() {
                 value={current}
                 onChange={(e) => setCurrent(e.target.value)}
                 placeholder={action.includes('ph') ? '7,0' : '75'}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
               />
             </div>
             <div>
@@ -103,7 +103,7 @@ export default function Calculator() {
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder={action.includes('ph') ? '7,4' : '100'}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
               />
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function Calculator() {
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] text-slate-500">liter</span>
           </div>
-          <p className="text-[11px] text-slate-600 mt-1">Förifyllt för {DEFAULT_SETTINGS.spaName}</p>
+          <p className="text-[11px] text-slate-500 mt-1">Förifyllt för {DEFAULT_SETTINGS.spaName}</p>
         </div>
 
         <button

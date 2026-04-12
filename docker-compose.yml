@@ -1,0 +1,7 @@
+services:
+  aquacare:
+    build: .
+    container_name: aquacare
+    restart: unless-stopped
+    ports:
+      - "3010:80"

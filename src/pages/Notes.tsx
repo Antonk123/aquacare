@@ -51,7 +51,7 @@ export default function Notes() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="T.ex. Byt filterpatron"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
                 autoFocus
               />
             </div>
@@ -76,7 +76,7 @@ export default function Notes() {
 
       {pending.length === 0 && completed.length === 0 && !showForm && (
         <GlassCard className="text-center py-6">
-          <p className="text-sm text-slate-500">Inga noteringar ännu</p>
+          <p className="text-sm text-slate-400">Inga noteringar ännu</p>
         </GlassCard>
       )}
 

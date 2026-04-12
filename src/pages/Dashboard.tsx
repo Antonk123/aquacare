@@ -69,7 +69,7 @@ export default function Dashboard() {
             })}
           </div>
         ) : (
-          <p className="text-sm text-slate-500 text-center py-4">Ingen loggning ännu. Logga ditt första vattentest!</p>
+          <p className="text-sm text-slate-400 text-center py-4">Ingen loggning ännu. Logga ditt första vattentest!</p>
         )}
       </GlassCard>
 

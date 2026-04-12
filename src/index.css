@@ -20,6 +20,17 @@ body {
   @apply bg-navy text-slate-200 antialiased;
   font-family: 'DM Sans', sans-serif;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+/* Safe area support for notch/gesture bar devices */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 @media (prefers-reduced-motion: reduce) {

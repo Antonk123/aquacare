@@ -72,7 +72,7 @@ export default function WaterLog() {
 
       {entries.length === 0 ? (
         <GlassCard className="text-center py-6">
-          <p className="text-sm text-slate-500">Inga loggningar ännu</p>
+          <p className="text-sm text-slate-400">Inga loggningar ännu</p>
         </GlassCard>
       ) : (
         <div className="space-y-2">
