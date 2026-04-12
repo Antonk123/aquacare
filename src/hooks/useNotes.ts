@@ -9,7 +9,9 @@ export function useNotes() {
   const addNote = useCallback(
     (title: string, dueDate: string) => {
       const note: Note = {
-        id: crypto.randomUUID(),
+        id: typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         title,
         dueDate,
         completed: false,

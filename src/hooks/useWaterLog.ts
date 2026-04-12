@@ -12,7 +12,10 @@ export function useWaterLog() {
 
   const addEntry = useCallback(
     (entry: Omit<WaterLogEntry, 'id'>) => {
-      const newEntry: WaterLogEntry = { ...entry, id: crypto.randomUUID() }
+      const id = typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+      const newEntry: WaterLogEntry = { ...entry, id }
       setEntries((prev) => [newEntry, ...prev])
 
       const today = new Date().toISOString().split('T')[0]

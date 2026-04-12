@@ -68,6 +68,7 @@ export default function WaterLogForm() {
           onCancel={() => setShowStrip(false)}
         />
       ) : (
+        <>
         <button
           type="button"
           onClick={() => setShowStrip(true)}
@@ -76,7 +77,6 @@ export default function WaterLogForm() {
           <Pipette size={16} strokeWidth={2.5} />
           Avläs teststicka
         </button>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
@@ -103,6 +103,8 @@ export default function WaterLogForm() {
           Spara loggning
         </button>
       </form>
+        </>
+      )}
     </div>
   )
 }

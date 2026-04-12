@@ -153,12 +153,12 @@ export const TEST_STRIP_COLORS = {
     unit: 'ppm',
     key: 'totalAlkalinity' as const,
     values: [
-      { value: 0, color: '#D4C850' },
-      { value: 40, color: '#A0B848' },
-      { value: 80, color: '#70A040' },
-      { value: 120, color: '#C09030' },
-      { value: 180, color: '#C06030' },
-      { value: 240, color: '#903020' },
+      { value: 0, color: '#D4A030' },
+      { value: 40, color: '#B8963C' },
+      { value: 80, color: '#8C7428' },
+      { value: 120, color: '#6B5820' },
+      { value: 180, color: '#4A5C28' },
+      { value: 240, color: '#2E4420' },
     ],
   },
 } as const
