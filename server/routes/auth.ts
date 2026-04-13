@@ -87,4 +87,77 @@ router.get('/me', authMiddleware, (req, res) => {
   })
 })
 
+// GET /api/auth/streak — compute streak from water_logs
+router.get('/streak', authMiddleware, (req, res) => {
+  const db = getDb()
+  const logs = db.prepare(`
+    SELECT DISTINCT date(date) AS log_date
+    FROM water_logs
+    WHERE facility_id = ?
+    ORDER BY log_date DESC
+    LIMIT 365
+  `).all(req.facilityId) as { log_date: string }[]
+
+  if (logs.length === 0) {
+    res.json({ currentStreak: 0, bestStreak: 0, lastLogDate: '' })
+    return
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+
+  let currentStreak = 0
+  let bestStreak = 0
+  let tempStreak = 0
+  let prevDate: string | null = null
+
+  for (const { log_date } of logs) {
+    if (!prevDate) {
+      // First entry — only count if today or yesterday
+      if (log_date === today || log_date === yesterday) {
+        tempStreak = 1
+      } else {
+        tempStreak = 1 // Count for best streak calculation
+      }
+    } else {
+      const prev = new Date(prevDate)
+      const curr = new Date(log_date)
+      const diffDays = Math.round((prev.getTime() - curr.getTime()) / 86400000)
+      if (diffDays === 1) {
+        tempStreak++
+      } else {
+        bestStreak = Math.max(bestStreak, tempStreak)
+        tempStreak = 1
+      }
+    }
+
+    if (!currentStreak && prevDate === null && (log_date === today || log_date === yesterday)) {
+      // Will be set after loop
+    }
+
+    prevDate = log_date
+  }
+  bestStreak = Math.max(bestStreak, tempStreak)
+
+  // Current streak: count consecutive days ending at today or yesterday
+  currentStreak = 0
+  for (const { log_date } of logs) {
+    const expected = new Date(Date.now() - currentStreak * 86400000).toISOString().split('T')[0]
+    const expectedYesterday = new Date(Date.now() - (currentStreak + 1) * 86400000).toISOString().split('T')[0]
+    if (currentStreak === 0 && log_date !== today && log_date !== yesterday) break
+    if (currentStreak === 0) {
+      currentStreak = 1
+      continue
+    }
+    const prevExpected = new Date(Date.now() - currentStreak * 86400000).toISOString().split('T')[0]
+    if (log_date === prevExpected) {
+      currentStreak++
+    } else {
+      break
+    }
+  }
+
+  res.json({ currentStreak, bestStreak, lastLogDate: logs[0].log_date })
+})
+
 export default router
