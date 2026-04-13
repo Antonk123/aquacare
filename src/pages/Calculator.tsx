@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, Calculator as CalcIcon } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { CALCULATOR_FORMULAS, DEFAULT_SETTINGS } from '../constants'
+import { api } from '../lib/api'
 import type { CalculatorAction } from '../types'
 
 export default function Calculator() {
@@ -11,6 +12,14 @@ export default function Calculator() {
   const [volume, setVolume] = useState(String(DEFAULT_SETTINGS.waterVolume))
   const [showDropdown, setShowDropdown] = useState(false)
   const [result, setResult] = useState<{ amount: number; formula: typeof CALCULATOR_FORMULAS[0] } | null>(null)
+  const [tubs, setTubs] = useState<{ id: string; name: string; volume: number }[]>([])
+  const [selectedTubId, setSelectedTubId] = useState<string>('')
+
+  useEffect(() => {
+    api.listTubs().then((rows) =>
+      setTubs(rows.map((t) => ({ id: t.id, name: t.name, volume: t.volume })))
+    ).catch(() => {})
+  }, [])
 
   const activeFormula = CALCULATOR_FORMULAS.find((f) => f.action === action)!
 
@@ -109,6 +118,35 @@ export default function Calculator() {
           </div>
         ) : null}
 
+        {tubs.length > 0 && (
+          <div>
+            <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+              Bad <span className="text-slate-500">(valfritt)</span>
+            </label>
+            <select
+              value={selectedTubId}
+              onChange={(e) => {
+                const id = e.target.value
+                setSelectedTubId(id)
+                if (id) {
+                  const tub = tubs.find((t) => t.id === id)
+                  if (tub) setVolume(String(tub.volume))
+                } else {
+                  setVolume(String(DEFAULT_SETTINGS.waterVolume))
+                }
+              }}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 focus:outline-none focus:border-gold/40 transition-colors duration-200 [color-scheme:dark]"
+            >
+              <option value="">Välj bad (valfritt)</option>
+              {tubs.map((tub) => (
+                <option key={tub.id} value={tub.id}>
+                  {tub.name} ({tub.volume} L)
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div>
           <label className="block text-xs text-slate-400 mb-1.5 font-medium">Vattenvolym</label>
           <div className="relative">
@@ -121,7 +159,9 @@ export default function Calculator() {
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] text-slate-500">liter</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Förifyllt för {DEFAULT_SETTINGS.spaName}</p>
+          <p className="text-[11px] text-slate-500 mt-1">
+            {selectedTubId ? 'Förifyllt från valt bad' : `Förifyllt för ${DEFAULT_SETTINGS.spaName}`}
+          </p>
         </div>
 
         <button
