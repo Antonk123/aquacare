@@ -46,16 +46,16 @@ router.post('/', (req, res) => {
 
 // PATCH /api/water-logs/:id — update log
 router.patch('/:id', (req, res) => {
-  const { note, ph, freeChlorine, bromine, totalAlkalinity, calciumHardness, tds, waterTemp } = req.body
+  const { tubId, note, ph, freeChlorine, bromine, totalAlkalinity, calciumHardness, tds, waterTemp } = req.body
   const db = getDb()
 
   const existing = db.prepare('SELECT id FROM water_logs WHERE id = ? AND facility_id = ?').get(req.params.id, req.facilityId)
   if (!existing) { res.status(404).json({ error: 'Loggningen hittades inte.' }); return }
 
   db.prepare(`
-    UPDATE water_logs SET note = ?, ph = ?, free_chlorine = ?, bromine = ?, total_alkalinity = ?, calcium_hardness = ?, tds = ?, water_temp = ?
+    UPDATE water_logs SET tub_id = ?, note = ?, ph = ?, free_chlorine = ?, bromine = ?, total_alkalinity = ?, calcium_hardness = ?, tds = ?, water_temp = ?
     WHERE id = ? AND facility_id = ?
-  `).run(note ?? null, ph ?? null, freeChlorine ?? null, bromine ?? null,
+  `).run(tubId ?? null, note ?? null, ph ?? null, freeChlorine ?? null, bromine ?? null,
     totalAlkalinity ?? null, calciumHardness ?? null, tds ?? null, waterTemp ?? null,
     req.params.id, req.facilityId)
 

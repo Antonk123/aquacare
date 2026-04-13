@@ -70,7 +70,7 @@ export const api = {
     request<any[]>('/water-logs'),
   createWaterLog: (data: { tubId?: string; date?: string; note?: string; ph?: number; freeChlorine?: number; bromine?: number; totalAlkalinity?: number; calciumHardness?: number; tds?: number; waterTemp?: number }) =>
     request<any>('/water-logs', { method: 'POST', body: JSON.stringify(data) }),
-  updateWaterLog: (id: string, data: { note?: string; ph?: number; freeChlorine?: number; bromine?: number; totalAlkalinity?: number; calciumHardness?: number; tds?: number; waterTemp?: number }) =>
+  updateWaterLog: (id: string, data: { tubId?: string; note?: string; ph?: number; freeChlorine?: number; bromine?: number; totalAlkalinity?: number; calciumHardness?: number; tds?: number; waterTemp?: number }) =>
     request<any>(`/water-logs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteWaterLog: (id: string) =>
     request<{ ok: boolean }>(`/water-logs/${id}`, { method: 'DELETE' }),

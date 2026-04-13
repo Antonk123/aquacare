@@ -55,6 +55,7 @@ export function useWaterLog() {
   const updateEntry = useCallback(
     async (id: string, patch: Partial<Omit<WaterLogEntry, 'id'>>) => {
       const row = await api.updateWaterLog(id, {
+        tubId: patch.tubId,
         note: patch.note,
         ph: patch.ph,
         freeChlorine: patch.freeChlorine,
