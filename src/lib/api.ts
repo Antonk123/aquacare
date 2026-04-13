@@ -86,10 +86,12 @@ export const api = {
     request<{ ok: boolean }>(`/notes/${id}`, { method: 'DELETE' }),
 
   // Schedule
-  getSchedule: (period: string) =>
-    request<{ periodKey: string; completions: { task_id: string; completed_at: string; user_name: string }[] }>(`/schedule/${period}`),
-  toggleScheduleTask: (period: string, taskId: string) =>
-    request<{ completed: boolean }>(`/schedule/${period}/${taskId}`, { method: 'POST' }),
+  getSchedule: (period: string, tubId?: string) => {
+    const qs = tubId ? `?tubId=${tubId}` : ''
+    return request<{ periodKey: string; completions: { task_id: string; tub_id: string | null; completed_at: string; user_name: string }[] }>(`/schedule/${period}${qs}`)
+  },
+  toggleScheduleTask: (period: string, taskId: string, tubId?: string) =>
+    request<{ completed: boolean }>(`/schedule/${period}/${taskId}`, { method: 'POST', body: JSON.stringify({ tubId }) }),
 
   // Streak
   getStreak: () =>
