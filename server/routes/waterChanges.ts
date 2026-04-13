@@ -2,6 +2,7 @@ import { Router } from 'express'
 import crypto from 'crypto'
 import { getDb } from '../db.js'
 import { authMiddleware } from '../middleware/auth.js'
+import { logActivity } from './activity.js'
 
 const router = Router()
 router.use(authMiddleware)
@@ -39,6 +40,7 @@ router.post('/', (req, res) => {
   db.prepare('INSERT INTO water_changes (id, facility_id, tub_id, user_id, changed_at) VALUES (?, ?, ?, ?, ?)').run(
     id, req.facilityId, tubId ?? null, req.user!.id, now
   )
+  logActivity(req.facilityId!, req.user!.id, 'water_changed', 'water_change', id)
   res.status(201).json({ id, changed_at: now, user_name: req.user!.name })
 })
 

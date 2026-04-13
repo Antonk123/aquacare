@@ -105,6 +105,10 @@ export const api = {
   markWaterChange: (tubId?: string) =>
     request<{ id: string; changed_at: string; user_name: string }>('/water-changes', { method: 'POST', body: JSON.stringify({ tubId }) }),
 
+  // Activity Log
+  getActivity: (limit?: number) =>
+    request<{ id: string; user_name: string; action: string; target_type: string | null; details: string | null; created_at: string }[]>(`/activity${limit ? '?limit=' + limit : ''}`),
+
   // Reports
   getReport: (params?: { tubId?: string; userId?: string; from?: string; to?: string }) => {
     const qs = new URLSearchParams()

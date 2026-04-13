@@ -2,6 +2,7 @@ import { Router } from 'express'
 import crypto from 'crypto'
 import { getDb } from '../db.js'
 import { authMiddleware } from '../middleware/auth.js'
+import { logActivity } from './activity.js'
 
 const router = Router()
 router.use(authMiddleware)
@@ -34,6 +35,8 @@ router.post('/', (req, res) => {
   `).run(id, req.facilityId, req.user!.id, tubId ?? null, logDate, note ?? null,
     ph ?? null, freeChlorine ?? null, bromine ?? null, totalAlkalinity ?? null,
     calciumHardness ?? null, tds ?? null, waterTemp ?? null)
+
+  logActivity(req.facilityId!, req.user!.id, 'water_log_created', 'water_log', id)
 
   res.status(201).json({
     id, facility_id: req.facilityId, user_id: req.user!.id, user_name: req.user!.name,

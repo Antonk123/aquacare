@@ -2,6 +2,7 @@ import { Router } from 'express'
 import crypto from 'crypto'
 import { getDb } from '../db.js'
 import { authMiddleware } from '../middleware/auth.js'
+import { logActivity } from './activity.js'
 
 const router = Router()
 router.use(authMiddleware)
@@ -63,12 +64,14 @@ router.post('/:period/:taskId', (req, res) => {
 
   if (existing) {
     db.prepare('DELETE FROM schedule_completions WHERE id = ?').run(existing.id)
+    logActivity(req.facilityId!, req.user!.id, 'task_unchecked', 'schedule', req.params.taskId)
     res.json({ completed: false })
   } else {
     const id = crypto.randomUUID()
     db.prepare(
       'INSERT INTO schedule_completions (id, facility_id, user_id, task_id, period_key, completed_at, tub_id) VALUES (?, ?, ?, ?, ?, ?, ?)'
     ).run(id, req.facilityId, req.user!.id, req.params.taskId, periodKey, new Date().toISOString(), tubId)
+    logActivity(req.facilityId!, req.user!.id, 'task_checked', 'schedule', req.params.taskId)
     res.json({ completed: true, userName: req.user!.name })
   }
 })
