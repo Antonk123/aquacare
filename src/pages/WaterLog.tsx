@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Info, Check, AlertTriangle, Trash2, Pencil } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
@@ -6,7 +6,13 @@ import { ValueBadge } from '../components/ValueBadge'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal } from '../constants'
+import { api } from '../lib/api'
 import type { ValueStatus } from '../types'
+
+interface Tub {
+  id: string
+  name: string
+}
 
 function formatDate(iso: string): string {
   const date = new Date(iso)
@@ -24,6 +30,14 @@ function formatDate(iso: string): string {
 export default function WaterLog() {
   const { entries, deleteEntry } = useWaterLog()
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [tubs, setTubs] = useState<Tub[]>([])
+  const [selectedTubId, setSelectedTubId] = useState<string>('')
+
+  useEffect(() => {
+    api.listTubs().then(setTubs).catch(() => {})
+  }, [])
+
+  const filtered = selectedTubId ? entries.filter((e) => e.tubId === selectedTubId) : entries
 
   function getEntryStatus(entry: typeof entries[0]): { status: ValueStatus; warnings: number } {
     let warnings = 0
@@ -51,6 +65,39 @@ export default function WaterLog() {
         </Link>
       </div>
 
+      {/* Tub filter pills */}
+      {tubs.length > 0 && (
+        <div
+          className="flex gap-2 overflow-x-auto pb-0.5"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as any}
+        >
+          <button
+            onClick={() => setSelectedTubId('')}
+            className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
+              selectedTubId === ''
+                ? 'bg-gold/90 text-navy font-semibold'
+                : 'bg-white/5 text-slate-400'
+            }`}
+          >
+            Alla
+          </button>
+          {tubs.map((tub) => (
+            <button
+              key={tub.id}
+              onClick={() => setSelectedTubId(tub.id)}
+              className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
+                selectedTubId === tub.id
+                  ? 'bg-gold/90 text-navy font-semibold'
+                  : 'bg-white/5 text-slate-400'
+              }`}
+            >
+              {tub.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <GlassCard>
         <div className="flex items-center gap-1.5 mb-2">
           <Info size={14} className="text-gold" />
@@ -73,13 +120,13 @@ export default function WaterLog() {
 
       <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium">Senaste loggningar</div>
 
-      {entries.length === 0 ? (
+      {filtered.length === 0 ? (
         <GlassCard className="text-center py-6">
           <p className="text-sm text-slate-400">Inga loggningar ännu</p>
         </GlassCard>
       ) : (
         <div className="space-y-2">
-          {entries.map((entry) => {
+          {filtered.map((entry) => {
             const { status, warnings } = getEntryStatus(entry)
             return (
               <GlassCard key={entry.id} className="!bg-glass-surface/70">
