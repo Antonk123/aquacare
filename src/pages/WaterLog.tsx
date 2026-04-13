@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Info, Check, AlertTriangle, Trash2 } from 'lucide-react'
+import { Plus, Info, Check, AlertTriangle, Trash2, Pencil } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { ValueBadge } from '../components/ValueBadge'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal } from '../constants'
 import type { ValueStatus } from '../types'
@@ -21,6 +23,7 @@ function formatDate(iso: string): string {
 
 export default function WaterLog() {
   const { entries, deleteEntry } = useWaterLog()
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   function getEntryStatus(entry: typeof entries[0]): { status: ValueStatus; warnings: number } {
     let warnings = 0
@@ -94,8 +97,15 @@ export default function WaterLog() {
                       {warnings} varning{warnings > 1 ? 'ar' : ''}
                     </span>
                   )}
+                  <Link
+                    to={`/logg/redigera/${entry.id}`}
+                    className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg transition-colors duration-200 active:scale-95"
+                    aria-label="Redigera loggning"
+                  >
+                    <Pencil size={14} className="text-slate-600" />
+                  </Link>
                   <button
-                    onClick={() => deleteEntry(entry.id)}
+                    onClick={() => setDeleteId(entry.id)}
                     className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg transition-colors duration-200 active:scale-95"
                     aria-label="Ta bort loggning"
                   >
@@ -119,6 +129,15 @@ export default function WaterLog() {
             )
           })}
         </div>
+      )}
+
+      {deleteId && (
+        <ConfirmDialog
+          title="Ta bort loggning"
+          message="Vill du verkligen ta bort denna vattenloggning? Det går inte att ångra."
+          onConfirm={() => { deleteEntry(deleteId); setDeleteId(null) }}
+          onCancel={() => setDeleteId(null)}
+        />
       )}
     </div>
   )

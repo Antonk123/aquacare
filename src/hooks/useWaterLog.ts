@@ -34,6 +34,13 @@ export function useWaterLog() {
     [setEntries, setStreak],
   )
 
+  const updateEntry = useCallback(
+    (id: string, patch: Partial<Omit<WaterLogEntry, 'id'>>) => {
+      setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)))
+    },
+    [setEntries],
+  )
+
   const deleteEntry = useCallback(
     (id: string) => {
       setEntries((prev) => prev.filter((e) => e.id !== id))
@@ -41,5 +48,5 @@ export function useWaterLog() {
     [setEntries],
   )
 
-  return { entries, streak, addEntry, deleteEntry }
+  return { entries, streak, addEntry, updateEntry, deleteEntry }
 }

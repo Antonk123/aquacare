@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Clock, Check, X } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useNotes } from '../hooks/useNotes'
 
 function formatDueDate(iso: string, completed: boolean, completedDate?: string): string {
@@ -15,6 +16,7 @@ export default function Notes() {
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -112,7 +114,7 @@ export default function Notes() {
             <div className="text-xs text-slate-600 mt-1">{formatDueDate(note.dueDate, true, note.completedDate)}</div>
           </div>
           <button
-            onClick={() => deleteNote(note.id)}
+            onClick={() => setDeleteId(note.id)}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Ta bort"
           >
@@ -120,6 +122,15 @@ export default function Notes() {
           </button>
         </div>
       ))}
+
+      {deleteId && (
+        <ConfirmDialog
+          title="Ta bort notering"
+          message="Vill du verkligen ta bort denna notering? Det går inte att ångra."
+          onConfirm={() => { deleteNote(deleteId); setDeleteId(null) }}
+          onCancel={() => setDeleteId(null)}
+        />
+      )}
     </div>
   )
 }

@@ -35,6 +35,7 @@ export interface Note {
 export interface Settings {
   spaName: string
   waterVolume: number
+  waterChangeCycleDays: number
 }
 
 export interface StreakData {

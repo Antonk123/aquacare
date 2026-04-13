@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Flame, Plus, Check } from 'lucide-react'
+import { Flame, Plus, Check, Settings } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { SmartStatus } from '../components/SmartStatus'
 import { TrendChart } from '../components/TrendChart'
@@ -22,6 +22,13 @@ export default function Dashboard() {
 
       {/* Header with temp pill */}
       <div className="text-center mb-1 relative">
+        <Link
+          to="/installningar"
+          className="absolute right-0 top-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Inställningar"
+        >
+          <Settings size={18} className="text-slate-400" />
+        </Link>
         <h1 className="font-display text-2xl text-gold tracking-[3px] font-bold">AquaCare</h1>
         <div className="inline-flex items-center gap-1.5 bg-gold/10 border border-gold/20 rounded-full px-3 py-1 mt-2">
           <div className="w-1.5 h-1.5 rounded-full bg-gold" />

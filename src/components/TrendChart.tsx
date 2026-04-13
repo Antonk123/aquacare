@@ -1,24 +1,37 @@
+import { useState } from 'react'
 import type { WaterLogEntry } from '../types'
 import { GlassCard } from './GlassCard'
+import { formatSwedishDecimal } from '../constants'
 
-export function TrendChart({ entries }: { entries: WaterLogEntry[] }) {
-  const phEntries = entries
-    .filter((e) => e.ph !== undefined)
+interface MetricConfig {
+  key: keyof WaterLogEntry
+  label: string
+  minY: number
+  maxY: number
+  optMin?: number
+  optMax?: number
+  color: string
+  fillId: string
+}
+
+const METRICS: MetricConfig[] = [
+  { key: 'ph', label: 'pH', minY: 6.8, maxY: 8.0, optMin: 7.2, optMax: 7.6, color: '#E8C97A', fillId: 'trendFillPh' },
+  { key: 'freeChlorine', label: 'Klor', minY: 0, maxY: 10, optMin: 3, optMax: 5, color: '#60A5FA', fillId: 'trendFillCl' },
+  { key: 'totalAlkalinity', label: 'Alkalinitet', minY: 0, maxY: 240, optMin: 80, optMax: 120, color: '#A78BFA', fillId: 'trendFillAlk' },
+]
+
+function MiniChart({ entries, metric }: { entries: WaterLogEntry[]; metric: MetricConfig }) {
+  const filtered = entries
+    .filter((e) => e[metric.key] !== undefined)
     .slice(0, 7)
     .reverse()
 
-  if (phEntries.length < 2) {
-    return (
-      <GlassCard>
-        <div className="text-[10px] text-gold font-semibold uppercase tracking-[1.5px] mb-2">pH-trend</div>
-        <p className="text-xs text-slate-500 text-center py-3">Logga fler test för att se trenden</p>
-      </GlassCard>
-    )
+  if (filtered.length < 2) {
+    return <p className="text-xs text-slate-500 text-center py-3">Logga fler test för att se trenden</p>
   }
 
-  const values = phEntries.map((e) => e.ph!)
-  const minY = 6.8
-  const maxY = 8.0
+  const values = filtered.map((e) => e[metric.key] as number)
+  const { minY, maxY } = metric
   const range = maxY - minY
 
   const w = 260
@@ -35,58 +48,87 @@ export function TrendChart({ entries }: { entries: WaterLogEntry[] }) {
   const polyline = points.map((p) => `${p.x},${p.y}`).join(' ')
   const areaPath = `M${points[0].x},${points[0].y} ${points.map((p) => `L${p.x},${p.y}`).join(' ')} L${points[points.length - 1].x},${h} L${points[0].x},${h} Z`
 
-  const optTop = h - ((7.6 - minY) / range) * h
-  const optBottom = h - ((7.2 - minY) / range) * h
+  const optTop = metric.optMax !== undefined ? h - ((metric.optMax - minY) / range) * h : 0
+  const optBottom = metric.optMin !== undefined ? h - ((metric.optMin - minY) / range) * h : h
+  const showOpt = metric.optMin !== undefined && metric.optMax !== undefined
 
   const last = points[points.length - 1]
 
-  const labels = phEntries.map((e) => {
+  const labels = filtered.map((e) => {
     const d = new Date(e.date)
     return d.toLocaleDateString('sv-SE', { weekday: 'short' }).replace('.', '')
   })
 
   return (
+    <svg viewBox={`0 0 ${w} ${h + 14}`} className="w-full" style={{ height: 60 }}>
+      <defs>
+        <linearGradient id={metric.fillId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={metric.color} stopOpacity="0.15" />
+          <stop offset="100%" stopColor={metric.color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {showOpt && (
+        <>
+          <rect x="0" y={optTop} width={w} height={optBottom - optTop} fill="rgba(74,222,128,0.04)" rx="2" />
+          <text x={w - 2} y={optTop - 1} fill="#475569" fontSize="5" textAnchor="end">
+            {formatSwedishDecimal(metric.optMax!)}
+          </text>
+          <text x={w - 2} y={optBottom + 6} fill="#475569" fontSize="5" textAnchor="end">
+            {formatSwedishDecimal(metric.optMin!)}
+          </text>
+        </>
+      )}
+
+      <path d={areaPath} fill={`url(#${metric.fillId})`} />
+
+      <polyline
+        points={polyline}
+        fill="none"
+        stroke={metric.color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <circle cx={last.x} cy={last.y} r="4" fill="#0a1628" stroke={metric.color} strokeWidth="2" />
+
+      {labels.map((label, i) => (
+        <text key={i} x={points[i].x} y={h + 10} fill="#475569" fontSize="5.5" textAnchor="middle">
+          {i === labels.length - 1 ? 'Nu' : label}
+        </text>
+      ))}
+    </svg>
+  )
+}
+
+export function TrendChart({ entries }: { entries: WaterLogEntry[] }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const active = METRICS[activeIdx]
+
+  return (
     <GlassCard className="!bg-gold/[0.03] !border-gold/10">
       <div className="flex justify-between items-center mb-2">
-        <div className="text-[10px] text-gold font-semibold uppercase tracking-[1.5px]">pH-trend</div>
-        <div className="text-[10px] text-slate-500">{values.length} test</div>
+        <div className="flex gap-1">
+          {METRICS.map((m, i) => (
+            <button
+              key={m.key}
+              onClick={() => setActiveIdx(i)}
+              className={`text-[10px] font-semibold uppercase tracking-[1px] px-2 py-1 rounded-lg transition-colors duration-200 ${
+                i === activeIdx
+                  ? 'text-navy bg-gold/90'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+        <div className="text-[10px] text-slate-500">
+          {entries.filter((e) => e[active.key] !== undefined).slice(0, 7).length} test
+        </div>
       </div>
-      <svg viewBox={`0 0 ${w} ${h + 14}`} className="w-full" style={{ height: 60 }}>
-        <defs>
-          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#E8C97A" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#E8C97A" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Optimal zone */}
-        <rect x="0" y={optTop} width={w} height={optBottom - optTop} fill="rgba(74,222,128,0.04)" rx="2" />
-        <text x={w - 2} y={optTop - 1} fill="#475569" fontSize="5" textAnchor="end">7,6</text>
-        <text x={w - 2} y={optBottom + 6} fill="#475569" fontSize="5" textAnchor="end">7,2</text>
-
-        {/* Area fill */}
-        <path d={areaPath} fill="url(#trendFill)" />
-
-        {/* Data line */}
-        <polyline
-          points={polyline}
-          fill="none"
-          stroke="#E8C97A"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* End point with ring */}
-        <circle cx={last.x} cy={last.y} r="4" fill="#0a1628" stroke="#E8C97A" strokeWidth="2" />
-
-        {/* Day labels */}
-        {labels.map((label, i) => (
-          <text key={i} x={points[i].x} y={h + 10} fill="#475569" fontSize="5.5" textAnchor="middle">
-            {i === labels.length - 1 ? 'Nu' : label}
-          </text>
-        ))}
-      </svg>
+      <MiniChart entries={entries} metric={active} />
     </GlassCard>
   )
 }

@@ -6,6 +6,7 @@ import WaterLog from './pages/WaterLog'
 import WaterLogForm from './pages/WaterLogForm'
 import Calculator from './pages/Calculator'
 import Notes from './pages/Notes'
+import Settings from './pages/Settings'
 
 export default function App() {
   return (
@@ -16,8 +17,10 @@ export default function App() {
           <Route path="schema" element={<Schedule />} />
           <Route path="logg" element={<WaterLog />} />
           <Route path="logg/ny" element={<WaterLogForm />} />
+          <Route path="logg/redigera/:id" element={<WaterLogForm />} />
           <Route path="kalkyl" element={<Calculator />} />
           <Route path="noteringar" element={<Notes />} />
+          <Route path="installningar" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

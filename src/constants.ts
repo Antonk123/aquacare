@@ -1,4 +1,5 @@
 import type {
+  Settings,
   ScheduleTask,
   SchedulePeriod,
   OptimalRange,
@@ -6,10 +7,21 @@ import type {
   ValueStatus,
 } from './types'
 
-export const DEFAULT_SETTINGS = {
+export const DEFAULT_SETTINGS: Settings = {
   spaName: 'MSpa Bristol Urban',
   waterVolume: 1000,
-} as const
+  waterChangeCycleDays: 90,
+}
+
+export const VALIDATION_RANGES: Record<string, { min: number; max: number; label: string }> = {
+  ph: { min: 0, max: 14, label: 'pH' },
+  freeChlorine: { min: 0, max: 30, label: 'Fritt klor' },
+  bromine: { min: 0, max: 30, label: 'Brom' },
+  totalAlkalinity: { min: 0, max: 500, label: 'Alkalinitet' },
+  calciumHardness: { min: 0, max: 1000, label: 'Kalciumhårdhet' },
+  tds: { min: 0, max: 5000, label: 'TDS' },
+  waterTemp: { min: 0, max: 50, label: 'Temperatur' },
+}
 
 export const OPTIMAL_RANGES: OptimalRange[] = [
   { label: 'pH', min: 7.2, max: 7.6, unit: '', key: 'ph' },
