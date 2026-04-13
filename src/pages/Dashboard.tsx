@@ -174,7 +174,7 @@ export default function Dashboard() {
           })}
 
           {/* Water age in bento */}
-          <WaterAge />
+          <WaterAge tubId={selectedTubId || undefined} />
         </div>
       )}
 

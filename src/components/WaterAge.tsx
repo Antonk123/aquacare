@@ -3,19 +3,20 @@ import { Droplets } from 'lucide-react'
 import { api } from '../lib/api'
 import { WATER_CHANGE_CYCLE_DAYS } from '../constants'
 
-export function WaterAge() {
+export function WaterAge({ tubId }: { tubId?: string }) {
   const [lastChange, setLastChange] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.getLatestWaterChange()
+    setLoading(true)
+    api.getLatestWaterChange(tubId)
       .then((data) => setLastChange(data?.changed_at?.split('T')[0] ?? null))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [tubId])
 
   async function markWaterChange() {
-    const result = await api.markWaterChange()
+    const result = await api.markWaterChange(tubId)
     setLastChange(result.changed_at.split('T')[0])
   }
 

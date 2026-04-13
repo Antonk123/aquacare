@@ -6,18 +6,27 @@ import { authMiddleware } from '../middleware/auth.js'
 const router = Router()
 router.use(authMiddleware)
 
-// GET /api/water-changes/latest — get latest water change for facility
+// GET /api/water-changes/latest?tubId=xxx — get latest water change for facility (optionally filtered by tub)
 router.get('/latest', (req, res) => {
+  const tubId = req.query.tubId as string | undefined
   const db = getDb()
-  const latest = db.prepare(`
+
+  let query = `
     SELECT wc.changed_at, u.name AS user_name, t.name AS tub_name
     FROM water_changes wc
     JOIN users u ON wc.user_id = u.id
     LEFT JOIN tubs t ON wc.tub_id = t.id
     WHERE wc.facility_id = ?
-    ORDER BY wc.changed_at DESC
-    LIMIT 1
-  `).get(req.facilityId)
+  `
+  const params: any[] = [req.facilityId]
+
+  if (tubId) {
+    query += ' AND wc.tub_id = ?'
+    params.push(tubId)
+  }
+
+  query += ' ORDER BY wc.changed_at DESC LIMIT 1'
+  const latest = db.prepare(query).get(...params)
   res.json(latest || null)
 })
 

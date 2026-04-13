@@ -98,8 +98,10 @@ export const api = {
     request<{ currentStreak: number; bestStreak: number; lastLogDate: string }>('/auth/streak'),
 
   // Water Changes
-  getLatestWaterChange: () =>
-    request<{ changed_at: string; user_name: string; tub_name: string | null } | null>('/water-changes/latest'),
+  getLatestWaterChange: (tubId?: string) => {
+    const qs = tubId ? `?tubId=${tubId}` : ''
+    return request<{ changed_at: string; user_name: string; tub_name: string | null } | null>(`/water-changes/latest${qs}`)
+  },
   markWaterChange: (tubId?: string) =>
     request<{ id: string; changed_at: string; user_name: string }>('/water-changes', { method: 'POST', body: JSON.stringify({ tubId }) }),
 
