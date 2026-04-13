@@ -9,6 +9,7 @@ import Calculator from './pages/Calculator'
 import Notes from './pages/Notes'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import Activity from './pages/Activity'
 import Welcome from './pages/Welcome'
 import CreateFacility from './pages/CreateFacility'
 import JoinFacility from './pages/JoinFacility'
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="noteringar" element={<Notes />} />
             <Route path="rapporter" element={<Reports />} />
             <Route path="installningar" element={<Settings />} />
+            <Route path="aktivitet" element={<Activity />} />
           </Route>
         </Routes>
       </AuthProvider>
