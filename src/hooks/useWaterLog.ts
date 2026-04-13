@@ -8,6 +8,8 @@ function mapFromApi(row: any): WaterLogEntry {
     id: row.id,
     date: row.date,
     note: row.note ?? undefined,
+    tubId: row.tub_id ?? undefined,
+    tubName: row.tub_name ?? undefined,
     ph: row.ph ?? undefined,
     freeChlorine: row.free_chlorine ?? undefined,
     bromine: row.bromine ?? undefined,
@@ -30,6 +32,7 @@ export function useWaterLog() {
   const addEntry = useCallback(
     async (entry: Omit<WaterLogEntry, 'id'>) => {
       const row = await api.createWaterLog({
+        tubId: entry.tubId,
         date: entry.date,
         note: entry.note,
         ph: entry.ph,
