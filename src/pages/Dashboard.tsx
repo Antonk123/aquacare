@@ -7,8 +7,9 @@ import { TrendChart } from '../components/TrendChart'
 import { WaterAge } from '../components/WaterAge'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { useSchedule } from '../hooks/useSchedule'
-import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal, DEFAULT_SETTINGS, SCHEDULE_TASKS } from '../constants'
+import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal, SCHEDULE_TASKS } from '../constants'
 import { api } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 interface Tub {
   id: string
@@ -43,6 +44,7 @@ function formatLastLog(lastLogDate: string | undefined): string {
 export default function Dashboard() {
   const { entries, streak } = useWaterLog()
   const { state: scheduleState, toggleTask } = useSchedule()
+  const { facility } = useAuth()
   const [tubs, setTubs] = useState<Tub[]>([])
   const [selectedTubId, setSelectedTubId] = useState<string>('')
 
@@ -80,7 +82,7 @@ export default function Dashboard() {
           <div className="w-1.5 h-1.5 rounded-full bg-gold" />
           <span className="text-[11px] text-gold font-medium">
             {latest?.waterTemp ? `${formatSwedishDecimal(latest.waterTemp)}°C · ` : ''}
-            {selectedTubId ? (tubs.find((t) => t.id === selectedTubId)?.name ?? DEFAULT_SETTINGS.spaName) : DEFAULT_SETTINGS.spaName}
+            {selectedTubId ? (tubs.find((t) => t.id === selectedTubId)?.name ?? facility?.name) : (facility?.name ?? 'AquaCare')}
           </span>
         </div>
       </div>
