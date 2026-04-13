@@ -76,60 +76,70 @@ export const PERIOD_LABELS: Record<SchedulePeriod, string> = {
   quarterly: '3 mån',
 }
 
+// Dosage values are approximate guidelines based on common spa products.
+// Actual dosage varies by product brand and concentration.
+// Always follow the product manufacturer's instructions.
+// Max dosage per application limits prevent dangerous over-dosing.
 export const CALCULATOR_FORMULAS: CalculatorFormula[] = [
   {
     action: 'raise-ph',
     label: 'Höja pH',
     product: 'Natriumkarbonat (pH+)',
     unit: 'g',
-    dosagePerUnit: 10,
+    dosagePerUnit: 6,
     changeStep: 0.1,
-    instruction: 'Tillsätt gradvis med jetsen igång. Testa igen efter 2 timmar.',
+    maxPerApplication: 30,
+    instruction: 'Tillsätt max 30g åt gången. Vänta 2 timmar och testa igen innan du tillsätter mer.',
   },
   {
     action: 'lower-ph',
     label: 'Sänka pH',
     product: 'Natriumbisulfat (pH−)',
     unit: 'g',
-    dosagePerUnit: 10,
+    dosagePerUnit: 8,
     changeStep: 0.1,
-    instruction: 'Tillsätt gradvis med jetsen igång. Testa igen efter 2 timmar.',
+    maxPerApplication: 40,
+    instruction: 'Tillsätt max 40g åt gången. Vänta 2 timmar och testa igen innan du tillsätter mer.',
   },
   {
     action: 'raise-alkalinity',
     label: 'Höja alkalinitet',
     product: 'Natriumbikarbonat',
     unit: 'g',
-    dosagePerUnit: 15,
+    dosagePerUnit: 17,
     changeStep: 10,
-    instruction: 'Lös upp i en hink vatten först. Tillsätt med pumpen igång.',
+    maxPerApplication: 85,
+    instruction: 'Lös upp i en hink vatten först. Max 85g åt gången, vänta 4 timmar mellan doser.',
   },
   {
     action: 'lower-alkalinity',
     label: 'Sänka alkalinitet',
     product: 'Natriumbisulfat',
     unit: 'g',
-    dosagePerUnit: 12,
+    dosagePerUnit: 10,
     changeStep: 10,
-    instruction: 'Tillsätt gradvis. Testa alkalinitet och pH efter 4 timmar.',
+    maxPerApplication: 50,
+    instruction: 'Tillsätt max 50g åt gången. Testa alkalinitet och pH efter 4 timmar.',
   },
   {
     action: 'shock',
     label: 'Chockbehandling',
-    product: 'Klorchock',
+    product: 'Klorchock (kalciumhypoklorit ~65%)',
     unit: 'g',
-    dosagePerUnit: 20,
+    dosagePerUnit: 15,
     changeStep: 1,
-    instruction: 'Tillsätt med locket öppet. Bada inte förrän klornivån sjunkit till under 5 mg/L.',
+    maxPerApplication: 30,
+    instruction: 'Tillsätt med locket öppet. Bada inte förrän fritt klor sjunkit under 5 mg/L.',
   },
   {
     action: 'add-chlorine',
     label: 'Tillsätt klor',
-    product: 'Diklorgranuler',
+    product: 'Diklorgranuler (~56% aktivt klor)',
     unit: 'g',
     dosagePerUnit: 2,
     changeStep: 1,
-    instruction: 'Lös upp i vatten först. Tillsätt med pumpen igång.',
+    maxPerApplication: 10,
+    instruction: 'Lös upp i vatten först. Max 10g åt gången, testa efter 30 minuter.',
   },
 ]
 

@@ -81,6 +81,7 @@ export interface CalculatorFormula {
   unit: string
   dosagePerUnit: number
   changeStep: number
+  maxPerApplication: number
   instruction: string
 }
 

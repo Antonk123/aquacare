@@ -11,7 +11,7 @@ export default function Calculator() {
   const [target, setTarget] = useState('')
   const [volume, setVolume] = useState(String(DEFAULT_SETTINGS.waterVolume))
   const [showDropdown, setShowDropdown] = useState(false)
-  const [result, setResult] = useState<{ amount: number; formula: typeof CALCULATOR_FORMULAS[0] } | null>(null)
+  const [result, setResult] = useState<{ amount: number; formula: typeof CALCULATOR_FORMULAS[0]; maxDose: number; exceeds: boolean } | null>(null)
   const [tubs, setTubs] = useState<{ id: string; name: string; volume: number }[]>([])
   const [selectedTubId, setSelectedTubId] = useState<string>('')
 
@@ -41,9 +41,12 @@ export default function Calculator() {
     }
 
     const steps = diff / activeFormula.changeStep
-    const amount = Math.round(steps * activeFormula.dosagePerUnit * (volumeVal / 1000))
+    const volumeFactor = volumeVal / 1000
+    const totalAmount = Math.round(steps * activeFormula.dosagePerUnit * volumeFactor)
+    const maxDose = Math.round(activeFormula.maxPerApplication * volumeFactor)
+    const exceeds = totalAmount > maxDose
 
-    setResult({ amount: Math.max(0, amount), formula: activeFormula })
+    setResult({ amount: Math.max(0, totalAmount), formula: activeFormula, maxDose, exceeds })
   }
 
   const needsTarget = action !== 'shock'
@@ -174,15 +177,39 @@ export default function Calculator() {
       </form>
 
       {result && (
-        <GlassCard className="!bg-status-ok/6 !border-status-ok/15 text-center">
-          <div className="text-[11px] text-slate-400 uppercase tracking-widest mb-2">Tillsätt i ditt spa</div>
-          <div className="text-4xl font-bold text-status-ok">
-            {result.amount} {result.formula.unit}
-          </div>
-          <div className="text-sm text-slate-300 mt-1">{result.formula.product}</div>
-          <div className="text-[11px] text-slate-500 mt-2">{result.formula.instruction}</div>
-        </GlassCard>
+        <>
+          {result.exceeds ? (
+            <GlassCard className="!bg-status-alert/8 !border-status-alert/20 text-center">
+              <div className="text-[11px] text-status-alert uppercase tracking-widest mb-2">Stor justering — dosera i omgångar</div>
+              <div className="text-sm text-slate-300 mb-3">
+                Total beräknad mängd: <span className="font-bold text-slate-200">{result.amount} {result.formula.unit}</span>
+              </div>
+              <div className="text-3xl font-bold text-status-alert">
+                Max {result.maxDose} {result.formula.unit}
+              </div>
+              <div className="text-xs text-slate-400 mt-1">per tillfälle</div>
+              <div className="text-sm text-slate-300 mt-2">{result.formula.product}</div>
+              <div className="text-[11px] text-slate-400 mt-2">{result.formula.instruction}</div>
+              <div className="text-[11px] text-status-alert/80 mt-3">
+                Tillsätt max {result.maxDose}{result.formula.unit}, vänta, testa igen. Upprepa tills målvärdet nås.
+              </div>
+            </GlassCard>
+          ) : (
+            <GlassCard className="!bg-status-ok/6 !border-status-ok/15 text-center">
+              <div className="text-[11px] text-slate-400 uppercase tracking-widest mb-2">Tillsätt i ditt spa</div>
+              <div className="text-4xl font-bold text-status-ok">
+                {result.amount} {result.formula.unit}
+              </div>
+              <div className="text-sm text-slate-300 mt-1">{result.formula.product}</div>
+              <div className="text-[11px] text-slate-500 mt-2">{result.formula.instruction}</div>
+            </GlassCard>
+          )}
+        </>
       )}
+
+      <div className="text-[10px] text-slate-600 text-center px-4">
+        Beräkningarna är ungefärliga riktlinjer. Faktisk dosering varierar beroende på produkt och vattnets kemi. Följ alltid produktens datablad.
+      </div>
     </div>
   )
 }

@@ -42,9 +42,15 @@ function getRecommendation(entry: WaterLogEntry) {
     const target = tooHigh ? (worstRange.max ?? worstValue) : (worstRange.min ?? worstValue)
     const diff = Math.abs(worstValue - target)
     const steps = diff / formula.changeStep
-    const amount = Math.round(steps * formula.dosagePerUnit * (DEFAULT_SETTINGS.waterVolume / 1000))
+    const volumeFactor = DEFAULT_SETTINGS.waterVolume / 1000
+    const amount = Math.round(steps * formula.dosagePerUnit * volumeFactor)
+    const maxDose = Math.round(formula.maxPerApplication * volumeFactor)
     if (amount > 0) {
-      dosage = `Tillsätt ${amount}${formula.unit} ${formula.product.toLowerCase()}.`
+      if (amount > maxDose) {
+        dosage = `Tillsätt max ${maxDose}${formula.unit} ${formula.product.toLowerCase()}, vänta och testa igen.`
+      } else {
+        dosage = `Tillsätt ${amount}${formula.unit} ${formula.product.toLowerCase()}.`
+      }
     }
   }
 
