@@ -1,16 +1,33 @@
+import { useState, useEffect } from 'react'
 import { Droplets } from 'lucide-react'
-import type { WaterChangeData } from '../types'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { STORAGE_KEYS, WATER_CHANGE_CYCLE_DAYS } from '../constants'
+import { api } from '../lib/api'
+import { WATER_CHANGE_CYCLE_DAYS } from '../constants'
 
 export function WaterAge() {
-  const [data, setData] = useLocalStorage<WaterChangeData | null>(STORAGE_KEYS.waterChange, null)
+  const [lastChange, setLastChange] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  function markWaterChange() {
-    setData({ lastChange: new Date().toISOString().split('T')[0] })
+  useEffect(() => {
+    api.getLatestWaterChange()
+      .then((data) => setLastChange(data?.changed_at?.split('T')[0] ?? null))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function markWaterChange() {
+    const result = await api.markWaterChange()
+    setLastChange(result.changed_at.split('T')[0])
   }
 
-  if (!data) {
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-glass-surface border border-glass-border rounded-2xl p-3 w-full">
+        <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!lastChange) {
     return (
       <button
         onClick={markWaterChange}
@@ -24,7 +41,7 @@ export function WaterAge() {
   }
 
   const daysSince = Math.floor(
-    (Date.now() - new Date(data.lastChange).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - new Date(lastChange).getTime()) / (1000 * 60 * 60 * 24)
   )
   const daysLeft = Math.max(0, WATER_CHANGE_CYCLE_DAYS - daysSince)
   const urgent = daysLeft <= 7

@@ -95,6 +95,12 @@ export const api = {
   getStreak: () =>
     request<{ currentStreak: number; bestStreak: number; lastLogDate: string }>('/auth/streak'),
 
+  // Water Changes
+  getLatestWaterChange: () =>
+    request<{ changed_at: string; user_name: string; tub_name: string | null } | null>('/water-changes/latest'),
+  markWaterChange: (tubId?: string) =>
+    request<{ id: string; changed_at: string; user_name: string }>('/water-changes', { method: 'POST', body: JSON.stringify({ tubId }) }),
+
   // Reports
   getReport: (params?: { tubId?: string; userId?: string; from?: string; to?: string }) => {
     const qs = new URLSearchParams()
