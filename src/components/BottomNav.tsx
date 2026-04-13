@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Calendar, Droplets, Table, Settings } from 'lucide-react'
+import { Home, Calendar, Droplets, BarChart3, Settings } from 'lucide-react'
 
 const tabs = [
   { to: '/', label: 'Hem', Icon: Home },
   { to: '/schema', label: 'Schema', Icon: Calendar },
   { to: '/logg', label: 'Logg', Icon: Droplets },
-  { to: '/kalkyl', label: 'Kalkyl', Icon: Table },
+  { to: '/rapporter', label: 'Rapport', Icon: BarChart3 },
   { to: '/installningar', label: 'Mer', Icon: Settings },
 ] as const
 

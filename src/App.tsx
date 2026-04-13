@@ -7,6 +7,7 @@ import WaterLog from './pages/WaterLog'
 import WaterLogForm from './pages/WaterLogForm'
 import Calculator from './pages/Calculator'
 import Notes from './pages/Notes'
+import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Welcome from './pages/Welcome'
 import CreateFacility from './pages/CreateFacility'
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="logg/redigera/:id" element={<WaterLogForm />} />
             <Route path="kalkyl" element={<Calculator />} />
             <Route path="noteringar" element={<Notes />} />
+            <Route path="rapporter" element={<Reports />} />
             <Route path="installningar" element={<Settings />} />
           </Route>
         </Routes>
