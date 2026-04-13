@@ -2,14 +2,14 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { runMigrations } from './migrate'
+import { runMigrations } from './migrate.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-import facilitiesRouter from './routes/facilities'
-import authRouter from './routes/auth'
-import tubsRouter from './routes/tubs'
-import usersRouter from './routes/users'
+import facilitiesRouter from './routes/facilities.js'
+import authRouter from './routes/auth.js'
+import tubsRouter from './routes/tubs.js'
+import usersRouter from './routes/users.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)

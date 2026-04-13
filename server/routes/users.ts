@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { getDb } from '../db'
-import { authMiddleware, adminOnly } from '../middleware/auth'
+import { getDb } from '../db.js'
+import { authMiddleware, adminOnly } from '../middleware/auth.js'
 
 const router = Router()
 router.use(authMiddleware)
