@@ -14,6 +14,7 @@ import waterLogsRouter from './routes/waterLogs.js'
 import notesRouter from './routes/notes.js'
 import scheduleRouter from './routes/schedule.js'
 import reportsRouter from './routes/reports.js'
+import waterChangesRouter from './routes/waterChanges.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
@@ -31,6 +32,7 @@ app.use('/api/water-logs', waterLogsRouter)
 app.use('/api/notes', notesRouter)
 app.use('/api/schedule', scheduleRouter)
 app.use('/api/reports', reportsRouter)
+app.use('/api/water-changes', waterChangesRouter)
 
 const distPath = path.join(__dirname, '..', 'dist')
 app.use(express.static(distPath))
