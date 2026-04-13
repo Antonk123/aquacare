@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Save, LogOut, Users, Copy, RefreshCw, Shield, Trash2, Waves, Pencil, Plus, X, Check, FileText, ChevronRight, BarChart3, Table } from 'lucide-react'
+import { ArrowLeft, Save, LogOut, Users, Copy, RefreshCw, Shield, Trash2, Waves, Pencil, Plus, X, Check, FileText, ChevronRight, BarChart3, Table, Clock } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useSettings } from '../hooks/useSettings'
@@ -224,6 +224,15 @@ export default function Settings() {
           <div className="flex items-center gap-3">
             <BarChart3 size={18} className="text-gold" />
             <span className="text-sm font-semibold text-slate-200">Rapporter</span>
+          </div>
+          <ChevronRight size={16} className="text-slate-500" />
+        </GlassCard>
+      </Link>
+      <Link to="/aktivitet">
+        <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200 mt-2">
+          <div className="flex items-center gap-3">
+            <Clock size={18} className="text-gold" />
+            <span className="text-sm font-semibold text-slate-200">Aktivitetslogg</span>
           </div>
           <ChevronRight size={16} className="text-slate-500" />
         </GlassCard>
