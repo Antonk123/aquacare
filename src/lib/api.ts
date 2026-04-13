@@ -94,6 +94,28 @@ export const api = {
   // Streak
   getStreak: () =>
     request<{ currentStreak: number; bestStreak: number; lastLogDate: string }>('/auth/streak'),
+
+  // Reports
+  getReport: (params?: { tubId?: string; userId?: string; from?: string; to?: string }) => {
+    const qs = new URLSearchParams()
+    if (params?.tubId) qs.set('tubId', params.tubId)
+    if (params?.userId) qs.set('userId', params.userId)
+    if (params?.from) qs.set('from', params.from)
+    if (params?.to) qs.set('to', params.to)
+    const query = qs.toString()
+    return request<{
+      logs: any[]
+      summary: {
+        totalLogs: number
+        uniqueDays: number
+        avgPh: number | null
+        avgChlorine: number | null
+        avgAlkalinity: number | null
+        periodDays: number
+        compliancePercent: number
+      }
+    }>(`/reports/water-logs${query ? '?' + query : ''}`)
+  },
 }
 
 export { ApiError }
