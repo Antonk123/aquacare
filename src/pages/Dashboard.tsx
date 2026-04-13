@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Flame, Plus, Check, Settings } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
@@ -7,13 +8,58 @@ import { WaterAge } from '../components/WaterAge'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { useSchedule } from '../hooks/useSchedule'
 import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal, DEFAULT_SETTINGS, SCHEDULE_TASKS } from '../constants'
+import { api } from '../lib/api'
+
+interface Tub {
+  id: string
+  name: string
+  volume: number
+  target_temp: number | null
+  sanitizer: string
+  created_at: string
+}
+
+function getTubStatusDot(lastLogDate: string | undefined): string {
+  if (!lastLogDate) return 'bg-status-error'
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+  const logDate = lastLogDate.split('T')[0]
+  if (logDate === today) return 'bg-status-ok'
+  if (logDate === yesterday) return 'bg-status-warn'
+  return 'bg-status-error'
+}
+
+function formatLastLog(lastLogDate: string | undefined): string {
+  if (!lastLogDate) return 'Aldrig loggad'
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+  const logDate = lastLogDate.split('T')[0]
+  const time = new Date(lastLogDate).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
+  if (logDate === today) return `Idag, ${time}`
+  if (logDate === yesterday) return `Igår, ${time}`
+  return new Date(lastLogDate).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })
+}
 
 export default function Dashboard() {
   const { entries, streak } = useWaterLog()
   const { state: scheduleState, toggleTask } = useSchedule()
-  const latest = entries[0]
+  const [tubs, setTubs] = useState<Tub[]>([])
+  const [selectedTubId, setSelectedTubId] = useState<string>('')
+
+  useEffect(() => {
+    api.listTubs().then(setTubs).catch(() => {})
+  }, [])
+
+  const filtered = selectedTubId ? entries.filter((e) => e.tubId === selectedTubId) : entries
+  const latest = filtered[0]
   const dailyTasks = SCHEDULE_TASKS.daily
   const doneCount = dailyTasks.filter((t) => scheduleState.daily[t.id]).length
+
+  // Tub status overview: last log per tub
+  const lastLogByTub = tubs.map((tub) => {
+    const lastEntry = entries.find((e) => e.tubId === tub.id)
+    return { tub, lastLogDate: lastEntry?.date }
+  })
 
   return (
     <div className="p-5 space-y-3 relative">
@@ -34,10 +80,61 @@ export default function Dashboard() {
           <div className="w-1.5 h-1.5 rounded-full bg-gold" />
           <span className="text-[11px] text-gold font-medium">
             {latest?.waterTemp ? `${formatSwedishDecimal(latest.waterTemp)}°C · ` : ''}
-            {DEFAULT_SETTINGS.spaName}
+            {selectedTubId ? (tubs.find((t) => t.id === selectedTubId)?.name ?? DEFAULT_SETTINGS.spaName) : DEFAULT_SETTINGS.spaName}
           </span>
         </div>
       </div>
+
+      {/* Tub filter pills */}
+      {tubs.length > 0 && (
+        <div
+          className="flex gap-2 overflow-x-auto pb-0.5"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as any}
+        >
+          <button
+            onClick={() => setSelectedTubId('')}
+            className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
+              selectedTubId === ''
+                ? 'bg-gold/90 text-navy font-semibold'
+                : 'bg-white/5 text-slate-400'
+            }`}
+          >
+            Alla
+          </button>
+          {tubs.map((tub) => (
+            <button
+              key={tub.id}
+              onClick={() => setSelectedTubId(tub.id)}
+              className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
+                selectedTubId === tub.id
+                  ? 'bg-gold/90 text-navy font-semibold'
+                  : 'bg-white/5 text-slate-400'
+              }`}
+            >
+              {tub.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Tub status overview — only when "Alla" selected and 2+ tubs */}
+      {tubs.length >= 2 && selectedTubId === '' && (
+        <GlassCard>
+          <div className="text-[10px] text-gold uppercase tracking-[1.5px] font-semibold mb-2">Badkarstatus</div>
+          <div className="space-y-2">
+            {lastLogByTub.map(({ tub, lastLogDate }) => (
+              <div key={tub.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getTubStatusDot(lastLogDate)}`} />
+                  <span className="text-[12px] text-slate-200 font-medium">{tub.name}</span>
+                </div>
+                <span className="text-[11px] text-slate-500">{formatLastLog(lastLogDate)}</span>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      )}
 
       {/* Hero Status */}
       <SmartStatus latest={latest} />
@@ -46,7 +143,7 @@ export default function Dashboard() {
       {latest && (
         <div className="grid grid-cols-2 gap-2">
           {OPTIMAL_RANGES.slice(0, 3).map((range, i) => {
-            const val = latest[range.key] as number | undefined
+            const val = filtered[0]?.[range.key] as number | undefined
             if (val === undefined) return null
             const status = getValueStatus(range, val)
             const statusColor = status === 'ok' ? 'text-status-ok' : status === 'warn' ? 'text-status-warn' : 'text-status-error'
@@ -80,7 +177,7 @@ export default function Dashboard() {
       )}
 
       {/* pH Trend */}
-      <TrendChart entries={entries} />
+      <TrendChart entries={filtered} />
 
       {/* Streak + Tasks */}
       <div className="flex gap-2">
