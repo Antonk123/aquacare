@@ -1,97 +1,181 @@
-import { useState } from 'react'
-import { ArrowLeft, Save } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, Save, LogOut, Users, Copy, RefreshCw, Shield, Trash2 } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useSettings } from '../hooks/useSettings'
+import { useAuth } from '../contexts/AuthContext'
+import { api } from '../lib/api'
 import { formatSwedishDecimal } from '../constants'
 
 export default function Settings() {
   const navigate = useNavigate()
   const { settings, updateSettings } = useSettings()
+  const { user, facility, isAdmin, logout } = useAuth()
   const [spaName, setSpaName] = useState(settings.spaName)
   const [volume, setVolume] = useState(String(settings.waterVolume))
   const [cycleDays, setCycleDays] = useState(String(settings.waterChangeCycleDays))
   const [saved, setSaved] = useState(false)
+
+  const [inviteCode, setInviteCode] = useState('')
+  const [users, setUsers] = useState<{ id: string; name: string; role: string; created_at: string }[]>([])
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null)
+  const [codeCopied, setCodeCopied] = useState(false)
+
+  useEffect(() => {
+    if (isAdmin) {
+      api.getInviteCode().then((d) => setInviteCode(d.inviteCode)).catch(() => {})
+      api.listUsers().then(setUsers).catch(() => {})
+    }
+  }, [isAdmin])
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
     const vol = Number(volume)
     const days = Number(cycleDays)
     if (!spaName.trim() || isNaN(vol) || vol <= 0 || isNaN(days) || days <= 0) return
-    updateSettings({
-      spaName: spaName.trim(),
-      waterVolume: vol,
-      waterChangeCycleDays: days,
-    })
+    updateSettings({ spaName: spaName.trim(), waterVolume: vol, waterChangeCycleDays: days })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  async function handleLogout() {
+    await logout()
+    navigate('/valkom', { replace: true })
+  }
+
+  async function handleRegenerateCode() {
+    const data = await api.regenerateInviteCode()
+    setInviteCode(data.inviteCode)
+  }
+
+  function copyCode() {
+    navigator.clipboard.writeText(inviteCode)
+    setCodeCopied(true)
+    setTimeout(() => setCodeCopied(false), 2000)
+  }
+
+  async function handleDeleteUser(id: string) {
+    await api.deleteUser(id)
+    setUsers((prev) => prev.filter((u) => u.id !== id))
+    setDeleteUserId(null)
+  }
+
+  async function handleToggleRole(id: string, currentRole: string) {
+    const newRole = currentRole === 'admin' ? 'staff' : 'admin'
+    await api.changeUserRole(id, newRole as 'admin' | 'staff')
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: newRole } : u)))
   }
 
   return (
     <div className="p-5 space-y-4">
       <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate(-1)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center"
-          aria-label="Tillbaka"
-        >
+        <button onClick={() => navigate(-1)} className="min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Tillbaka">
           <ArrowLeft size={20} className="text-slate-400" />
         </button>
         <h1 className="font-display text-xl text-gold font-bold">Inställningar</h1>
       </div>
 
+      {/* User info */}
+      <GlassCard>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-semibold text-slate-200">{user?.name}</div>
+            <div className="text-xs text-slate-400">{facility?.name} — {user?.role === 'admin' ? 'Admin' : 'Personal'}</div>
+          </div>
+          <button onClick={handleLogout} className="flex items-center gap-1.5 min-h-[44px] px-3 text-red-400 text-sm font-medium">
+            <LogOut size={16} />
+            Logga ut
+          </button>
+        </div>
+      </GlassCard>
+
+      {/* Local settings */}
       <form onSubmit={handleSave} className="space-y-3">
+        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium">Lokala inställningar</div>
         <GlassCard>
           <div className="space-y-3">
             <div>
               <label className="block text-xs text-slate-400 mb-1.5 font-medium">Spa-namn</label>
-              <input
-                type="text"
-                value={spaName}
-                onChange={(e) => setSpaName(e.target.value)}
-                placeholder="MSpa Bristol Urban"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
-              />
+              <input type="text" value={spaName} onChange={(e) => setSpaName(e.target.value)} placeholder="MSpa Bristol Urban" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
             </div>
             <div>
               <label className="block text-xs text-slate-400 mb-1.5 font-medium">Vattenvolym (liter)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={volume}
-                onChange={(e) => setVolume(e.target.value)}
-                placeholder="1000"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
-              />
-              <span className="text-[11px] text-slate-500 mt-1 block">
-                Används för kemikalieberäkningar
-              </span>
+              <input type="text" inputMode="numeric" value={volume} onChange={(e) => setVolume(e.target.value)} placeholder="1000" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
             </div>
             <div>
               <label className="block text-xs text-slate-400 mb-1.5 font-medium">Vattenbytescykel (dagar)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={cycleDays}
-                onChange={(e) => setCycleDays(e.target.value)}
-                placeholder="90"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
-              />
-              <span className="text-[11px] text-slate-500 mt-1 block">
-                Nuvarande cykel: {formatSwedishDecimal(settings.waterChangeCycleDays)} dagar
-              </span>
+              <input type="text" inputMode="numeric" value={cycleDays} onChange={(e) => setCycleDays(e.target.value)} placeholder="90" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
+              <span className="text-[11px] text-slate-500 mt-1 block">Nuvarande cykel: {formatSwedishDecimal(settings.waterChangeCycleDays)} dagar</span>
             </div>
           </div>
         </GlassCard>
-
-        <button
-          type="submit"
-          className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-[14px] font-bold text-[15px] tracking-wide shadow-[0_4px_16px_rgba(232,201,122,0.2)] transition-transform duration-200 active:scale-[0.98]"
-        >
+        <button type="submit" className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-[14px] font-bold text-[15px] tracking-wide shadow-[0_4px_16px_rgba(232,201,122,0.2)] transition-transform duration-200 active:scale-[0.98]">
           <Save size={18} strokeWidth={2.5} />
           {saved ? 'Sparat!' : 'Spara inställningar'}
         </button>
       </form>
+
+      {/* Admin section */}
+      {isAdmin && (
+        <>
+          <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium pt-2">Administration</div>
+          <GlassCard>
+            <div className="flex items-center gap-2 mb-2">
+              <Users size={14} className="text-gold" />
+              <span className="text-xs text-gold font-semibold uppercase tracking-wider">Inbjudningskod</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] flex items-center text-lg font-mono text-slate-200 tracking-[4px]">
+                {inviteCode}
+              </div>
+              <button onClick={copyCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-white/5 border border-white/10 rounded-xl" aria-label="Kopiera">
+                <Copy size={16} className={codeCopied ? 'text-status-ok' : 'text-slate-400'} />
+              </button>
+              <button onClick={handleRegenerateCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-white/5 border border-white/10 rounded-xl" aria-label="Generera ny kod">
+                <RefreshCw size={16} className="text-slate-400" />
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-2">Dela koden med personal som ska gå med i anläggningen.</p>
+          </GlassCard>
+
+          <GlassCard>
+            <div className="flex items-center gap-2 mb-3">
+              <Users size={14} className="text-gold" />
+              <span className="text-xs text-gold font-semibold uppercase tracking-wider">Personal ({users.length})</span>
+            </div>
+            <div className="space-y-2">
+              {users.map((u) => (
+                <div key={u.id} className="flex items-center justify-between py-1">
+                  <div>
+                    <span className="text-sm text-slate-200">{u.name}</span>
+                    <span className="text-[10px] text-slate-500 ml-2">{u.role === 'admin' ? 'Admin' : 'Personal'}</span>
+                  </div>
+                  {u.id !== user?.id && (
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => handleToggleRole(u.id, u.role)} className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg" aria-label="Ändra roll">
+                        <Shield size={14} className="text-slate-600" />
+                      </button>
+                      <button onClick={() => setDeleteUserId(u.id)} className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg" aria-label="Ta bort">
+                        <Trash2 size={14} className="text-slate-600" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        </>
+      )}
+
+      {deleteUserId && (
+        <ConfirmDialog
+          title="Ta bort användare"
+          message="Vill du verkligen ta bort denna användare? Deras sessioner invalideras direkt."
+          onConfirm={() => handleDeleteUser(deleteUserId)}
+          onCancel={() => setDeleteUserId(null)}
+        />
+      )}
     </div>
   )
 }
