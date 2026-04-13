@@ -7,11 +7,11 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useSettings } from '../hooks/useSettings'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
-import { formatSwedishDecimal } from '../constants'
+import { formatSwedishDecimal, OPTIMAL_RANGES } from '../constants'
 
-type Tub = { id: string; name: string; volume: number; sanitizer: string }
+type Tub = { id: string; name: string; volume: number; sanitizer: string; custom_ranges: string | null }
 
-const EMPTY_TUB_FORM = { name: '', volume: '1000', sanitizer: 'klor' }
+const EMPTY_TUB_FORM = { name: '', volume: '1000', sanitizer: 'klor', customRanges: {} as Record<string, { min?: string; max?: string }> }
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -40,7 +40,7 @@ export default function Settings() {
       api.getInviteCode().then((d) => setInviteCode(d.inviteCode)).catch(() => {})
       api.listUsers().then(setUsers).catch(() => {})
       api.listTubs().then((rows) =>
-        setTubs(rows.map((t) => ({ id: t.id, name: t.name, volume: t.volume, sanitizer: t.sanitizer })))
+        setTubs(rows.map((t) => ({ id: t.id, name: t.name, volume: t.volume, sanitizer: t.sanitizer, custom_ranges: t.custom_ranges ?? null })))
       ).catch(() => {})
     }
   }, [isAdmin])
@@ -90,8 +90,17 @@ export default function Settings() {
   }
 
   function openEditTub(tub: Tub) {
+    const parsed = tub.custom_ranges ? JSON.parse(tub.custom_ranges) : {}
+    const customRanges: Record<string, { min?: string; max?: string }> = {}
+    for (const [key, val] of Object.entries(parsed)) {
+      const v = val as { min?: number; max?: number }
+      customRanges[key] = {
+        min: v.min !== undefined ? String(v.min) : '',
+        max: v.max !== undefined ? String(v.max) : '',
+      }
+    }
     setEditingTubId(tub.id)
-    setTubForm({ name: tub.name, volume: String(tub.volume), sanitizer: tub.sanitizer })
+    setTubForm({ name: tub.name, volume: String(tub.volume), sanitizer: tub.sanitizer, customRanges })
     setShowTubForm(true)
   }
 
@@ -107,13 +116,27 @@ export default function Settings() {
     const volume = Number(tubForm.volume)
     if (!name || isNaN(volume) || volume <= 0) return
     setTubSaving(true)
+
+    // Build customRanges for API
+    const customRanges: Record<string, { min?: number; max?: number }> = {}
+    for (const [key, val] of Object.entries(tubForm.customRanges)) {
+      const min = val.min ? Number(val.min.replace(',', '.')) : undefined
+      const max = val.max ? Number(val.max.replace(',', '.')) : undefined
+      if (min !== undefined || max !== undefined) {
+        customRanges[key] = {}
+        if (min !== undefined && !isNaN(min)) customRanges[key].min = min
+        if (max !== undefined && !isNaN(max)) customRanges[key].max = max
+      }
+    }
+    const hasCustomRanges = Object.keys(customRanges).length > 0
+
     try {
       if (editingTubId) {
-        const updated = await api.updateTub(editingTubId, { name, volume, sanitizer: tubForm.sanitizer })
-        setTubs((prev) => prev.map((t) => t.id === editingTubId ? { id: updated.id, name: updated.name, volume: updated.volume, sanitizer: updated.sanitizer } : t))
+        const updated = await api.updateTub(editingTubId, { name, volume, sanitizer: tubForm.sanitizer, customRanges: hasCustomRanges ? customRanges as Record<string, { min: number; max: number }> : null })
+        setTubs((prev) => prev.map((t) => t.id === editingTubId ? { id: updated.id, name: updated.name, volume: updated.volume, sanitizer: updated.sanitizer, custom_ranges: updated.custom_ranges ?? null } : t))
       } else {
-        const created = await api.createTub({ name, volume, sanitizer: tubForm.sanitizer })
-        setTubs((prev) => [...prev, { id: created.id, name: created.name, volume: created.volume, sanitizer: created.sanitizer }])
+        const created = await api.createTub({ name, volume, sanitizer: tubForm.sanitizer, customRanges: hasCustomRanges ? customRanges as Record<string, { min: number; max: number }> : undefined })
+        setTubs((prev) => [...prev, { id: created.id, name: created.name, volume: created.volume, sanitizer: created.sanitizer, custom_ranges: created.custom_ranges ?? null }])
       }
       cancelTubForm()
     } finally {
@@ -348,6 +371,48 @@ export default function Settings() {
                     <option value="brom">Brom</option>
                   </select>
                 </div>
+
+                {/* Custom ranges */}
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    Gränsvärden <span className="text-slate-500">(lämna tomt för standard)</span>
+                  </label>
+                  <div className="space-y-2">
+                    {OPTIMAL_RANGES.filter(r => r.key !== 'waterTemp').map((range) => {
+                      const custom = tubForm.customRanges[range.key as string] || {}
+                      return (
+                        <div key={range.key} className="flex items-center gap-2">
+                          <span className="text-[11px] text-slate-400 w-16 flex-shrink-0">{range.label}</span>
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder={range.min !== undefined ? String(range.min) : '–'}
+                            value={custom.min ?? ''}
+                            onChange={(e) => setTubForm(f => ({
+                              ...f,
+                              customRanges: { ...f.customRanges, [range.key]: { ...f.customRanges[range.key as string], min: e.target.value } }
+                            }))}
+                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-2 min-h-[36px] text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40"
+                          />
+                          <span className="text-[10px] text-slate-600">–</span>
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder={range.max !== undefined ? String(range.max) : '–'}
+                            value={custom.max ?? ''}
+                            onChange={(e) => setTubForm(f => ({
+                              ...f,
+                              customRanges: { ...f.customRanges, [range.key]: { ...f.customRanges[range.key as string], max: e.target.value } }
+                            }))}
+                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-2 min-h-[36px] text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40"
+                          />
+                          {range.unit && <span className="text-[10px] text-slate-500 w-10 flex-shrink-0">{range.unit}</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
                 <div className="flex gap-2 pt-1">
                   <button
                     type="submit"
