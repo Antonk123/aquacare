@@ -1,75 +1,68 @@
-import { useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { ScheduleState, SchedulePeriod } from '../types'
-import { useLocalStorage } from './useLocalStorage'
-import { STORAGE_KEYS, SCHEDULE_TASKS } from '../constants'
+import { SCHEDULE_TASKS } from '../constants'
+import { api } from '../lib/api'
 
-function getResetDate(period: SchedulePeriod): string {
-  const now = new Date()
-  switch (period) {
-    case 'daily':
-      return now.toISOString().split('T')[0]
-    case 'weekly': {
-      const day = now.getDay()
-      const monday = new Date(now)
-      monday.setDate(now.getDate() - ((day + 6) % 7))
-      return monday.toISOString().split('T')[0]
-    }
-    case 'monthly':
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-    case 'quarterly': {
-      const quarter = Math.floor(now.getMonth() / 3)
-      return `${now.getFullYear()}-${String(quarter * 3 + 1).padStart(2, '0')}-01`
-    }
-  }
-}
+const PERIODS: SchedulePeriod[] = ['daily', 'weekly', 'monthly', 'quarterly']
 
 function createEmptyState(): ScheduleState {
-  const now = new Date().toISOString().split('T')[0]
   return {
     daily: {},
     weekly: {},
     monthly: {},
     quarterly: {},
-    lastReset: { daily: now, weekly: now, monthly: now, quarterly: now },
+    lastReset: { daily: '', weekly: '', monthly: '', quarterly: '' },
   }
 }
 
 export function useSchedule() {
-  const [state, setState] = useLocalStorage<ScheduleState>(STORAGE_KEYS.schedule, createEmptyState())
+  const [state, setState] = useState<ScheduleState>(createEmptyState)
 
-  const resetState = useMemo(() => {
-    const periods: SchedulePeriod[] = ['daily', 'weekly', 'monthly', 'quarterly']
-    let needsReset = false
-    const updated = { ...state, lastReset: { ...state.lastReset } }
-
-    for (const period of periods) {
-      const resetDate = getResetDate(period)
-      if (state.lastReset[period] !== resetDate) {
-        updated[period] = {}
-        updated.lastReset[period] = resetDate
-        needsReset = true
+  useEffect(() => {
+    async function loadAll() {
+      const newState = createEmptyState()
+      for (const period of PERIODS) {
+        try {
+          const { periodKey, completions } = await api.getSchedule(period)
+          newState.lastReset[period] = periodKey
+          for (const c of completions) {
+            newState[period][c.task_id] = true
+          }
+        } catch { /* ignore */ }
       }
+      setState(newState)
     }
+    loadAll()
+  }, [])
 
-    if (needsReset) {
-      setState(updated)
-      return updated
-    }
-    return state
-  }, [state, setState])
+  const toggleTask = useCallback(
+    async (period: SchedulePeriod, taskId: string) => {
+      // Optimistic update
+      setState((prev) => ({
+        ...prev,
+        [period]: { ...prev[period], [taskId]: !prev[period][taskId] },
+      }))
+      try {
+        await api.toggleScheduleTask(period, taskId)
+      } catch {
+        // Revert on error
+        setState((prev) => ({
+          ...prev,
+          [period]: { ...prev[period], [taskId]: !prev[period][taskId] },
+        }))
+      }
+    },
+    [],
+  )
 
-  function toggleTask(period: SchedulePeriod, taskId: string) {
-    setState((prev) => ({
-      ...prev,
-      [period]: { ...prev[period], [taskId]: !prev[period][taskId] },
-    }))
-  }
+  const getProgress = useCallback(
+    (period: SchedulePeriod) => {
+      const tasks = SCHEDULE_TASKS[period]
+      const done = tasks.filter((t) => state[period][t.id]).length
+      return { done, total: tasks.length, percent: tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0 }
+    },
+    [state],
+  )
 
-  function getProgress(period: SchedulePeriod) {
-    const tasks = SCHEDULE_TASKS[period]
-    const done = tasks.filter((t) => resetState[period][t.id]).length
-    return { done, total: tasks.length, percent: tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0 }
-  }
-
-  return { state: resetState, toggleTask, getProgress }
+  return { state, toggleTask, getProgress }
 }

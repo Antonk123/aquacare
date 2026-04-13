@@ -1,51 +1,79 @@
-import { useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { WaterLogEntry, StreakData } from '../types'
-import { useLocalStorage } from './useLocalStorage'
-import { STORAGE_KEYS } from '../constants'
+import { api } from '../lib/api'
+
+// API returns snake_case, frontend uses camelCase
+function mapFromApi(row: any): WaterLogEntry {
+  return {
+    id: row.id,
+    date: row.date,
+    note: row.note ?? undefined,
+    ph: row.ph ?? undefined,
+    freeChlorine: row.free_chlorine ?? undefined,
+    bromine: row.bromine ?? undefined,
+    totalAlkalinity: row.total_alkalinity ?? undefined,
+    calciumHardness: row.calcium_hardness ?? undefined,
+    tds: row.tds ?? undefined,
+    waterTemp: row.water_temp ?? undefined,
+  }
+}
 
 export function useWaterLog() {
-  const [entries, setEntries] = useLocalStorage<WaterLogEntry[]>(STORAGE_KEYS.waterLog, [])
-  const [streak, setStreak] = useLocalStorage<StreakData>(STORAGE_KEYS.streak, {
-    currentStreak: 0,
-    bestStreak: 0,
-    lastLogDate: '',
-  })
+  const [entries, setEntries] = useState<WaterLogEntry[]>([])
+  const [streak, setStreak] = useState<StreakData>({ currentStreak: 0, bestStreak: 0, lastLogDate: '' })
+
+  useEffect(() => {
+    api.listWaterLogs().then((rows) => setEntries(rows.map(mapFromApi))).catch(() => {})
+    api.getStreak().then(setStreak).catch(() => {})
+  }, [])
 
   const addEntry = useCallback(
-    (entry: Omit<WaterLogEntry, 'id'>) => {
-      const id = typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-      const newEntry: WaterLogEntry = { ...entry, id }
-      setEntries((prev) => [newEntry, ...prev])
-
-      const today = new Date().toISOString().split('T')[0]
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
-
-      setStreak((prev) => {
-        if (prev.lastLogDate === today) return prev
-        const newStreak = prev.lastLogDate === yesterday ? prev.currentStreak + 1 : 1
-        const bestStreak = Math.max(prev.bestStreak ?? 0, newStreak)
-        return { currentStreak: newStreak, bestStreak, lastLogDate: today }
+    async (entry: Omit<WaterLogEntry, 'id'>) => {
+      const row = await api.createWaterLog({
+        date: entry.date,
+        note: entry.note,
+        ph: entry.ph,
+        freeChlorine: entry.freeChlorine,
+        bromine: entry.bromine,
+        totalAlkalinity: entry.totalAlkalinity,
+        calciumHardness: entry.calciumHardness,
+        tds: entry.tds,
+        waterTemp: entry.waterTemp,
       })
-
-      return newEntry
+      const mapped = mapFromApi(row)
+      setEntries((prev) => [mapped, ...prev])
+      // Refresh streak
+      api.getStreak().then(setStreak).catch(() => {})
+      return mapped
     },
-    [setEntries, setStreak],
+    [],
   )
 
   const updateEntry = useCallback(
-    (id: string, patch: Partial<Omit<WaterLogEntry, 'id'>>) => {
-      setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)))
+    async (id: string, patch: Partial<Omit<WaterLogEntry, 'id'>>) => {
+      const row = await api.updateWaterLog(id, {
+        note: patch.note,
+        ph: patch.ph,
+        freeChlorine: patch.freeChlorine,
+        bromine: patch.bromine,
+        totalAlkalinity: patch.totalAlkalinity,
+        calciumHardness: patch.calciumHardness,
+        tds: patch.tds,
+        waterTemp: patch.waterTemp,
+      })
+      const mapped = mapFromApi(row)
+      setEntries((prev) => prev.map((e) => (e.id === id ? mapped : e)))
     },
-    [setEntries],
+    [],
   )
 
   const deleteEntry = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      await api.deleteWaterLog(id)
       setEntries((prev) => prev.filter((e) => e.id !== id))
+      api.getStreak().then(setStreak).catch(() => {})
     },
-    [setEntries],
+    [],
   )
 
   return { entries, streak, addEntry, updateEntry, deleteEntry }

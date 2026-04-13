@@ -64,6 +64,36 @@ export const api = {
     request<{ ok: boolean }>(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
   getInviteCode: () => request<{ inviteCode: string }>('/facilities/invite'),
   regenerateInviteCode: () => request<{ inviteCode: string }>('/facilities/invite', { method: 'POST' }),
+
+  // Water Logs
+  listWaterLogs: () =>
+    request<any[]>('/water-logs'),
+  createWaterLog: (data: { tubId?: string; date?: string; note?: string; ph?: number; freeChlorine?: number; bromine?: number; totalAlkalinity?: number; calciumHardness?: number; tds?: number; waterTemp?: number }) =>
+    request<any>('/water-logs', { method: 'POST', body: JSON.stringify(data) }),
+  updateWaterLog: (id: string, data: { note?: string; ph?: number; freeChlorine?: number; bromine?: number; totalAlkalinity?: number; calciumHardness?: number; tds?: number; waterTemp?: number }) =>
+    request<any>(`/water-logs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteWaterLog: (id: string) =>
+    request<{ ok: boolean }>(`/water-logs/${id}`, { method: 'DELETE' }),
+
+  // Notes
+  listNotes: () =>
+    request<any[]>('/notes'),
+  createNote: (data: { title: string; dueDate: string }) =>
+    request<any>('/notes', { method: 'POST', body: JSON.stringify(data) }),
+  updateNote: (id: string, data: { completed?: boolean; title?: string }) =>
+    request<any>(`/notes/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteNote: (id: string) =>
+    request<{ ok: boolean }>(`/notes/${id}`, { method: 'DELETE' }),
+
+  // Schedule
+  getSchedule: (period: string) =>
+    request<{ periodKey: string; completions: { task_id: string; completed_at: string; user_name: string }[] }>(`/schedule/${period}`),
+  toggleScheduleTask: (period: string, taskId: string) =>
+    request<{ completed: boolean }>(`/schedule/${period}/${taskId}`, { method: 'POST' }),
+
+  // Streak
+  getStreak: () =>
+    request<{ currentStreak: number; bestStreak: number; lastLogDate: string }>('/auth/streak'),
 }
 
 export { ApiError }

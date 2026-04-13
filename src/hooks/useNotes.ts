@@ -1,45 +1,51 @@
-import { useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Note } from '../types'
-import { useLocalStorage } from './useLocalStorage'
-import { STORAGE_KEYS } from '../constants'
+import { api } from '../lib/api'
+
+function mapFromApi(row: any): Note {
+  return {
+    id: row.id,
+    title: row.title,
+    dueDate: row.due_date,
+    completed: !!row.completed,
+    completedDate: row.completed_date ?? undefined,
+  }
+}
 
 export function useNotes() {
-  const [notes, setNotes] = useLocalStorage<Note[]>(STORAGE_KEYS.notes, [])
+  const [notes, setNotes] = useState<Note[]>([])
+
+  useEffect(() => {
+    api.listNotes().then((rows) => setNotes(rows.map(mapFromApi))).catch(() => {})
+  }, [])
 
   const addNote = useCallback(
-    (title: string, dueDate: string) => {
-      const note: Note = {
-        id: typeof crypto.randomUUID === 'function'
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-        title,
-        dueDate,
-        completed: false,
-      }
-      setNotes((prev) => [note, ...prev])
-      return note
+    async (title: string, dueDate: string) => {
+      const row = await api.createNote({ title, dueDate })
+      const mapped = mapFromApi(row)
+      setNotes((prev) => [mapped, ...prev])
+      return mapped
     },
-    [setNotes],
+    [],
   )
 
   const toggleNote = useCallback(
-    (id: string) => {
-      setNotes((prev) =>
-        prev.map((n) =>
-          n.id === id
-            ? { ...n, completed: !n.completed, completedDate: !n.completed ? new Date().toISOString() : undefined }
-            : n,
-        ),
-      )
+    async (id: string) => {
+      const current = notes.find((n) => n.id === id)
+      if (!current) return
+      const row = await api.updateNote(id, { completed: !current.completed })
+      const mapped = mapFromApi(row)
+      setNotes((prev) => prev.map((n) => (n.id === id ? mapped : n)))
     },
-    [setNotes],
+    [notes],
   )
 
   const deleteNote = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      await api.deleteNote(id)
       setNotes((prev) => prev.filter((n) => n.id !== id))
     },
-    [setNotes],
+    [],
   )
 
   return { notes, addNote, toggleNote, deleteNote }
