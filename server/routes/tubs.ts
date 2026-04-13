@@ -9,25 +9,26 @@ router.use(authMiddleware)
 router.get('/', (req, res) => {
   const db = getDb()
   const tubs = db.prepare(
-    'SELECT id, name, volume, target_temp, sanitizer, created_at FROM tubs WHERE facility_id = ? AND archived = 0 ORDER BY name'
+    'SELECT id, name, volume, target_temp, sanitizer, custom_ranges, created_at FROM tubs WHERE facility_id = ? AND archived = 0 ORDER BY name'
   ).all(req.facilityId)
   res.json(tubs)
 })
 
 router.post('/', adminOnly, (req, res) => {
-  const { name, volume, targetTemp, sanitizer } = req.body
+  const { name, volume, targetTemp, sanitizer, customRanges } = req.body
   if (!name?.trim() || !volume || typeof volume !== 'number' || volume <= 0) {
     res.status(400).json({ error: 'Namn och volym krävs.' })
     return
   }
   const san = sanitizer === 'bromine' ? 'bromine' : 'chlorine'
+  const rangesJson = customRanges ? JSON.stringify(customRanges) : null
   const db = getDb()
   const id = crypto.randomUUID()
   const now = new Date().toISOString()
   db.prepare(
-    'INSERT INTO tubs (id, facility_id, name, volume, target_temp, sanitizer, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
-  ).run(id, req.facilityId, name.trim(), volume, targetTemp ?? null, san, now)
-  res.status(201).json({ id, name: name.trim(), volume, target_temp: targetTemp ?? null, sanitizer: san, created_at: now })
+    'INSERT INTO tubs (id, facility_id, name, volume, target_temp, sanitizer, custom_ranges, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run(id, req.facilityId, name.trim(), volume, targetTemp ?? null, san, rangesJson, now)
+  res.status(201).json({ id, name: name.trim(), volume, target_temp: targetTemp ?? null, sanitizer: san, custom_ranges: rangesJson, created_at: now })
 })
 
 router.patch('/:id', adminOnly, (req, res) => {
@@ -42,12 +43,16 @@ router.patch('/:id', adminOnly, (req, res) => {
   if (typeof volume === 'number' && volume > 0) { updates.push('volume = ?'); values.push(volume) }
   if (targetTemp !== undefined) { updates.push('target_temp = ?'); values.push(targetTemp) }
   if (sanitizer === 'chlorine' || sanitizer === 'bromine') { updates.push('sanitizer = ?'); values.push(sanitizer) }
+  if (req.body.customRanges !== undefined) {
+    updates.push('custom_ranges = ?')
+    values.push(req.body.customRanges ? JSON.stringify(req.body.customRanges) : null)
+  }
 
   if (updates.length === 0) { res.status(400).json({ error: 'Inga fält att uppdatera.' }); return }
 
   values.push(req.params.id, req.facilityId)
   db.prepare(`UPDATE tubs SET ${updates.join(', ')} WHERE id = ? AND facility_id = ?`).run(...values)
-  const updated = db.prepare('SELECT id, name, volume, target_temp, sanitizer, created_at FROM tubs WHERE id = ?').get(req.params.id)
+  const updated = db.prepare('SELECT id, name, volume, target_temp, sanitizer, custom_ranges, created_at FROM tubs WHERE id = ?').get(req.params.id)
   res.json(updated)
 })
 

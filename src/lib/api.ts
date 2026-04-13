@@ -47,13 +47,13 @@ export const api = {
   logout: () => request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
   me: () => request<{ user: { id: string; name: string; role: string }; facility: { id: string; name: string } }>('/auth/me'),
   listTubs: () =>
-    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; created_at: string }[]>('/tubs'),
-  createTub: (data: { name: string; volume: number; targetTemp?: number; sanitizer?: string }) =>
-    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; created_at: string }>(
+    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; custom_ranges: string | null; created_at: string }[]>('/tubs'),
+  createTub: (data: { name: string; volume: number; targetTemp?: number; sanitizer?: string; customRanges?: Record<string, { min: number; max: number }> }) =>
+    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; custom_ranges: string | null; created_at: string }>(
       '/tubs', { method: 'POST', body: JSON.stringify(data) }
     ),
-  updateTub: (id: string, data: { name?: string; volume?: number; targetTemp?: number; sanitizer?: string }) =>
-    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; created_at: string }>(
+  updateTub: (id: string, data: { name?: string; volume?: number; targetTemp?: number; sanitizer?: string; customRanges?: Record<string, { min: number; max: number }> | null }) =>
+    request<{ id: string; name: string; volume: number; target_temp: number | null; sanitizer: string; custom_ranges: string | null; created_at: string }>(
       `/tubs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }
     ),
   deleteTub: (id: string) => request<{ ok: boolean }>(`/tubs/${id}`, { method: 'DELETE' }),
