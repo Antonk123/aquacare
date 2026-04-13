@@ -13,6 +13,7 @@ import usersRouter from './routes/users.js'
 import waterLogsRouter from './routes/waterLogs.js'
 import notesRouter from './routes/notes.js'
 import scheduleRouter from './routes/schedule.js'
+import reportsRouter from './routes/reports.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
@@ -29,6 +30,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/water-logs', waterLogsRouter)
 app.use('/api/notes', notesRouter)
 app.use('/api/schedule', scheduleRouter)
+app.use('/api/reports', reportsRouter)
 
 const distPath = path.join(__dirname, '..', 'dist')
 app.use(express.static(distPath))
