@@ -84,7 +84,12 @@ export default function WaterLog() {
             return (
               <GlassCard key={entry.id} className="!bg-glass-surface/70">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[13px] text-slate-300 font-semibold">{formatDate(entry.date)}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] text-slate-300 font-semibold">{formatDate(entry.date)}</span>
+                    {entry.tubName && (
+                      <span className="text-[10px] bg-gold/10 text-gold px-2 py-0.5 rounded-lg font-medium">{entry.tubName}</span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                   {status === 'ok' ? (
                     <span className="inline-flex items-center gap-1 bg-status-ok/12 text-status-ok text-[10px] px-2 py-0.5 rounded-lg font-semibold">

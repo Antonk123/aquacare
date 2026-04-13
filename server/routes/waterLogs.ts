@@ -10,9 +10,10 @@ router.use(authMiddleware)
 router.get('/', (req, res) => {
   const db = getDb()
   const logs = db.prepare(`
-    SELECT wl.*, u.name AS user_name
+    SELECT wl.*, u.name AS user_name, t.name AS tub_name
     FROM water_logs wl
     JOIN users u ON wl.user_id = u.id
+    LEFT JOIN tubs t ON wl.tub_id = t.id
     WHERE wl.facility_id = ?
     ORDER BY wl.date DESC
     LIMIT 100
@@ -59,7 +60,11 @@ router.patch('/:id', (req, res) => {
     req.params.id, req.facilityId)
 
   const updated = db.prepare(`
-    SELECT wl.*, u.name AS user_name FROM water_logs wl JOIN users u ON wl.user_id = u.id WHERE wl.id = ?
+    SELECT wl.*, u.name AS user_name, t.name AS tub_name
+    FROM water_logs wl
+    JOIN users u ON wl.user_id = u.id
+    LEFT JOIN tubs t ON wl.tub_id = t.id
+    WHERE wl.id = ?
   `).get(req.params.id)
   res.json(updated)
 })

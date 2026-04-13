@@ -5,6 +5,7 @@ import { useWaterLog } from '../hooks/useWaterLog'
 import { StripReader } from '../components/StripReader'
 import { GlassCard } from '../components/GlassCard'
 import { VALIDATION_RANGES } from '../constants'
+import { api } from '../lib/api'
 
 interface FormField {
   key: string
@@ -38,9 +39,16 @@ export default function WaterLogForm() {
   const [showStrip, setShowStrip] = useState(false)
   const [stripDone, setStripDone] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [tubs, setTubs] = useState<{ id: string; name: string; volume: number; sanitizer: string }[]>([])
+  const [selectedTubId, setSelectedTubId] = useState<string>('')
 
   const isEditing = !!id
   const editEntry = isEditing ? entries.find((e) => e.id === id) : undefined
+
+  // Load tubs on mount
+  useEffect(() => {
+    api.listTubs().then(setTubs).catch(() => {})
+  }, [])
 
   // Populate form when editing
   useEffect(() => {
@@ -54,6 +62,7 @@ export default function WaterLogForm() {
       }
       setValues(vals)
       setNote(editEntry.note ?? '')
+      setSelectedTubId(editEntry.tubId ?? '')
     }
   }, [editEntry])
 
@@ -90,6 +99,9 @@ export default function WaterLogForm() {
       entry.note = note.trim()
     } else {
       entry.note = undefined
+    }
+    if (selectedTubId) {
+      entry.tubId = selectedTubId
     }
     for (const field of FIELDS) {
       const raw = values[field.key]?.replace(',', '.')
@@ -187,6 +199,27 @@ export default function WaterLogForm() {
           ))}
 
           <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Tub selector */}
+            {tubs.length > 0 && (
+              <div>
+                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                  Bad <span className="text-slate-500">(valfritt)</span>
+                </label>
+                <select
+                  value={selectedTubId}
+                  onChange={(e) => setSelectedTubId(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 focus:outline-none focus:border-gold/40 transition-colors duration-200 [color-scheme:dark]"
+                >
+                  <option value="">Välj bad (valfritt)</option>
+                  {tubs.map((tub) => (
+                    <option key={tub.id} value={tub.id}>
+                      {tub.name} ({tub.volume} L)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Note field */}
             <div>
               <label className="block text-xs text-slate-400 mb-1.5 font-medium">

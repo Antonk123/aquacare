@@ -2,6 +2,8 @@ export interface WaterLogEntry {
   id: string
   date: string
   note?: string
+  tubId?: string
+  tubName?: string
   ph?: number
   freeChlorine?: number
   bromine?: number
