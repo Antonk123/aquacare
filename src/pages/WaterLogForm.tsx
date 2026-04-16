@@ -129,7 +129,7 @@ export default function WaterLogForm() {
   if (isEditing && !editEntry) {
     return (
       <div className="p-5">
-        <p className="text-sm text-slate-400">Loggningen hittades inte.</p>
+        <p className="text-sm text-charcoal-muted">Loggningen hittades inte.</p>
       </div>
     )
   }
@@ -213,13 +213,13 @@ export default function WaterLogForm() {
             {/* Tub selector */}
             {tubs.length > 0 && (
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                  Bad <span className="text-slate-500">(valfritt)</span>
+                <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">
+                  Bad <span className="text-charcoal-muted">(valfritt)</span>
                 </label>
                 <select
                   value={selectedTubId}
                   onChange={(e) => setSelectedTubId(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 focus:outline-none focus:border-gold/40 transition-colors duration-200 [color-scheme:dark]"
+                  className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200"
                 >
                   <option value="">Välj bad (valfritt)</option>
                   {tubs.map((tub) => (

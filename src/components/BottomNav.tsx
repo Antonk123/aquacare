@@ -1,12 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Calendar, Droplets, Table, Settings } from 'lucide-react'
+import { Home, Droplets, MoreHorizontal } from 'lucide-react'
 
 const tabs = [
   { to: '/', label: 'Hem', Icon: Home },
-  { to: '/schema', label: 'Schema', Icon: Calendar },
   { to: '/logg', label: 'Logg', Icon: Droplets },
-  { to: '/kalkyl', label: 'Kalkyl', Icon: Table },
-  { to: '/installningar', label: 'Mer', Icon: Settings },
+  { to: '/mer', label: 'Mer', Icon: MoreHorizontal },
 ] as const
 
 export function BottomNav() {

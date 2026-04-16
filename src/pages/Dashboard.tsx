@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Flame, Plus, Check, Settings } from 'lucide-react'
+import { Flame, Plus, Check } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { SmartStatus } from '../components/SmartStatus'
 import { TrendChart } from '../components/TrendChart'
@@ -68,16 +68,7 @@ export default function Dashboard() {
     <div className="p-5 space-y-4">
       {/* Editorial header */}
       <div className="relative text-center pt-2 pb-1">
-        <div className="absolute right-0 top-0 flex items-center gap-1">
-          <ThemeToggle />
-          <Link
-            to="/installningar"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label="Inställningar"
-          >
-            <Settings size={18} className="text-charcoal-muted" strokeWidth={1.75} />
-          </Link>
-        </div>
+        <ThemeToggle className="absolute right-0 top-0" />
         <h1 className="font-display text-[32px] leading-none font-semibold text-charcoal tracking-[-0.04em]">
           AquaCare
         </h1>
@@ -101,8 +92,8 @@ export default function Dashboard() {
             onClick={() => setSelectedTubId('')}
             className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
               selectedTubId === ''
-                ? 'bg-gold/90 text-navy font-semibold'
-                : 'bg-white/5 text-slate-400'
+                ? 'bg-charcoal text-cream-light font-semibold'
+                : 'bg-charcoal-whisper text-charcoal-muted'
             }`}
           >
             Alla
@@ -113,8 +104,8 @@ export default function Dashboard() {
               onClick={() => setSelectedTubId(tub.id)}
               className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
                 selectedTubId === tub.id
-                  ? 'bg-gold/90 text-navy font-semibold'
-                  : 'bg-white/5 text-slate-400'
+                  ? 'bg-charcoal text-cream-light font-semibold'
+                  : 'bg-charcoal-whisper text-charcoal-muted'
               }`}
             >
               {tub.name}
@@ -126,15 +117,15 @@ export default function Dashboard() {
       {/* Tub status overview — only when "Alla" selected and 2+ tubs */}
       {tubs.length >= 2 && selectedTubId === '' && (
         <GlassCard>
-          <div className="text-[10px] text-gold uppercase tracking-[1.5px] font-semibold mb-2">Badkarstatus</div>
+          <div className="text-[10px] text-charcoal-muted uppercase tracking-[1.5px] font-medium mb-2">Badkarstatus</div>
           <div className="space-y-2">
             {lastLogByTub.map(({ tub, lastLogDate }) => (
               <div key={tub.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getTubStatusDot(lastLogDate)}`} />
-                  <span className="text-[12px] text-slate-200 font-medium">{tub.name}</span>
+                  <span className="text-[12px] text-charcoal font-medium">{tub.name}</span>
                 </div>
-                <span className="text-[11px] text-slate-500">{formatLastLog(lastLogDate)}</span>
+                <span className="text-[11px] text-charcoal-muted">{formatLastLog(lastLogDate)}</span>
               </div>
             ))}
           </div>

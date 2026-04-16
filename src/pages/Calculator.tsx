@@ -138,8 +138,8 @@ export default function Calculator() {
 
         {tubs.length > 0 && (
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-              Bad <span className="text-slate-500">(valfritt)</span>
+            <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">
+              Bad <span className="text-charcoal-muted">(valfritt)</span>
             </label>
             <select
               value={selectedTubId}
@@ -153,7 +153,7 @@ export default function Calculator() {
                   setVolume(String(DEFAULT_SETTINGS.waterVolume))
                 }
               }}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 focus:outline-none focus:border-gold/40 transition-colors duration-200 [color-scheme:dark]"
+              className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200"
             >
               <option value="">Välj bad (valfritt)</option>
               {tubs.map((tub) => (
@@ -224,7 +224,7 @@ export default function Calculator() {
         </>
       )}
 
-      <div className="text-[10px] text-slate-600 text-center px-4">
+      <div className="text-[10px] text-charcoal-muted text-center px-4">
         Beräkningarna är ungefärliga riktlinjer. Faktisk dosering varierar beroende på produkt och vattnets kemi. Följ alltid produktens datablad.
       </div>
     </div>

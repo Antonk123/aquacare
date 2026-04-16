@@ -10,6 +10,7 @@ import Notes from './pages/Notes'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Activity from './pages/Activity'
+import More from './pages/More'
 import Welcome from './pages/Welcome'
 import CreateFacility from './pages/CreateFacility'
 import JoinFacility from './pages/JoinFacility'
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="logg" element={<WaterLog />} />
             <Route path="logg/ny" element={<WaterLogForm />} />
             <Route path="logg/redigera/:id" element={<WaterLogForm />} />
+            <Route path="mer" element={<More />} />
             <Route path="kalkyl" element={<Calculator />} />
             <Route path="noteringar" element={<Notes />} />
             <Route path="rapporter" element={<Reports />} />

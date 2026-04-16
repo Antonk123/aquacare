@@ -111,7 +111,7 @@ function FilterPill({
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
-        active ? 'bg-gold/90 text-navy font-semibold' : 'bg-white/5 text-slate-400'
+        active ? 'bg-charcoal text-cream-light font-semibold' : 'bg-charcoal-whisper text-charcoal-muted'
       }`}
     >
       {label}
@@ -124,7 +124,7 @@ function SummaryCard({ summary, loading }: { summary: ReportSummary | null; load
     return (
       <GlassCard>
         <div className="h-24 flex items-center justify-center">
-          <span className="text-slate-500 text-sm">Laddar...</span>
+          <span className="text-charcoal-muted text-sm">Laddar...</span>
         </div>
       </GlassCard>
     )
@@ -133,22 +133,22 @@ function SummaryCard({ summary, loading }: { summary: ReportSummary | null; load
   if (!summary) return null
 
   return (
-    <GlassCard className="!bg-gold/[0.03] !border-gold/10">
-      <h2 className="text-[11px] uppercase tracking-[1.5px] text-slate-500 mb-3">Sammanfattning</h2>
+    <GlassCard className="bg-charcoal-whisper border-cream-border">
+      <h2 className="text-[11px] uppercase tracking-[1.5px] text-charcoal-muted mb-3">Sammanfattning</h2>
       <div className="grid grid-cols-2 gap-x-4 gap-y-3">
         {/* Total logs */}
         <div>
-          <p className="text-[11px] text-slate-400">Total loggar</p>
-          <p className="text-2xl font-bold text-white leading-none mt-0.5">{summary.totalLogs}</p>
+          <p className="text-[11px] text-charcoal-muted">Total loggar</p>
+          <p className="text-2xl font-bold text-charcoal leading-none mt-0.5">{summary.totalLogs}</p>
         </div>
 
         {/* Compliance */}
         <div>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-charcoal-muted">
             Unika dagar{' '}
-            <span className="text-slate-600">av {summary.periodDays}</span>
+            <span className="text-charcoal-muted">av {summary.periodDays}</span>
           </p>
-          <p className="text-2xl font-bold text-white leading-none mt-0.5">
+          <p className="text-2xl font-bold text-charcoal leading-none mt-0.5">
             {summary.uniqueDays}
             <span className={`text-sm font-semibold ml-1.5 ${complianceColor(summary.compliancePercent)}`}>
               {summary.compliancePercent}%
@@ -158,25 +158,25 @@ function SummaryCard({ summary, loading }: { summary: ReportSummary | null; load
 
         {/* Avg pH */}
         <div>
-          <p className="text-[11px] text-slate-400">Snitt pH</p>
-          <p className="text-xl font-bold text-gold leading-none mt-0.5">{fmtVal(summary.avgPh)}</p>
+          <p className="text-[11px] text-charcoal-muted">Snitt pH</p>
+          <p className="text-xl font-bold text-charcoal leading-none mt-0.5">{fmtVal(summary.avgPh)}</p>
         </div>
 
         {/* Avg chlorine */}
         <div>
-          <p className="text-[11px] text-slate-400">Snitt klor</p>
+          <p className="text-[11px] text-charcoal-muted">Snitt klor</p>
           <p className="text-xl font-bold text-blue-400 leading-none mt-0.5">
             {fmtVal(summary.avgChlorine)}
-            {summary.avgChlorine !== null && <span className="text-xs font-normal text-slate-500 ml-1">mg/L</span>}
+            {summary.avgChlorine !== null && <span className="text-xs font-normal text-charcoal-muted ml-1">mg/L</span>}
           </p>
         </div>
 
         {/* Avg alkalinity */}
         <div>
-          <p className="text-[11px] text-slate-400">Snitt alkalinitet</p>
+          <p className="text-[11px] text-charcoal-muted">Snitt alkalinitet</p>
           <p className="text-xl font-bold text-violet-400 leading-none mt-0.5">
             {fmtVal(summary.avgAlkalinity)}
-            {summary.avgAlkalinity !== null && <span className="text-xs font-normal text-slate-500 ml-1">mg/L</span>}
+            {summary.avgAlkalinity !== null && <span className="text-xs font-normal text-charcoal-muted ml-1">mg/L</span>}
           </p>
         </div>
       </div>
@@ -189,7 +189,7 @@ function LogList({ logs, loading }: { logs: any[]; loading: boolean }) {
     return (
       <GlassCard>
         <div className="h-16 flex items-center justify-center">
-          <span className="text-slate-500 text-sm">Laddar...</span>
+          <span className="text-charcoal-muted text-sm">Laddar...</span>
         </div>
       </GlassCard>
     )
@@ -198,50 +198,50 @@ function LogList({ logs, loading }: { logs: any[]; loading: boolean }) {
   if (logs.length === 0) {
     return (
       <GlassCard>
-        <p className="text-slate-500 text-sm text-center py-4">Inga loggar i valt intervall</p>
+        <p className="text-charcoal-muted text-sm text-center py-4">Inga loggar i valt intervall</p>
       </GlassCard>
     )
   }
 
   return (
     <GlassCard>
-      <h2 className="text-[11px] uppercase tracking-[1.5px] text-slate-500 mb-3">Loggar</h2>
+      <h2 className="text-[11px] uppercase tracking-[1.5px] text-charcoal-muted mb-3">Loggar</h2>
       <div className="space-y-2">
         {logs.map((log) => {
           const d = new Date(log.date)
           const datum = d.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })
           const tid = d.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
           return (
-            <div key={log.id} className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0">
+            <div key={log.id} className="flex items-start gap-3 py-2 border-b border-cream-border last:border-0">
               {/* Date */}
               <div className="w-16 shrink-0">
-                <p className="text-[11px] font-semibold text-slate-300">{datum}</p>
-                <p className="text-[10px] text-slate-500">{tid}</p>
+                <p className="text-[11px] font-semibold text-charcoal">{datum}</p>
+                <p className="text-[10px] text-charcoal-muted">{tid}</p>
               </div>
 
               {/* Tub / person */}
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-gold truncate">{log.tub_name ?? '–'}</p>
-                <p className="text-[10px] text-slate-500 truncate">{log.user_name}</p>
+                <p className="text-[11px] text-charcoal truncate">{log.tub_name ?? '–'}</p>
+                <p className="text-[10px] text-charcoal-muted truncate">{log.user_name}</p>
               </div>
 
               {/* Key values */}
               <div className="flex gap-2 shrink-0">
                 {log.ph !== null && (
                   <div className="text-right">
-                    <p className="text-[10px] text-slate-500">pH</p>
-                    <p className="text-[12px] font-semibold text-white">{fmtVal(log.ph)}</p>
+                    <p className="text-[10px] text-charcoal-muted">pH</p>
+                    <p className="text-[12px] font-semibold text-charcoal">{fmtVal(log.ph)}</p>
                   </div>
                 )}
                 {log.free_chlorine !== null && (
                   <div className="text-right">
-                    <p className="text-[10px] text-slate-500">Cl</p>
+                    <p className="text-[10px] text-charcoal-muted">Cl</p>
                     <p className="text-[12px] font-semibold text-blue-300">{fmtVal(log.free_chlorine)}</p>
                   </div>
                 )}
                 {log.total_alkalinity !== null && (
                   <div className="text-right">
-                    <p className="text-[10px] text-slate-500">Alk</p>
+                    <p className="text-[10px] text-charcoal-muted">Alk</p>
                     <p className="text-[12px] font-semibold text-violet-300">{fmtVal(log.total_alkalinity)}</p>
                   </div>
                 )}
@@ -324,8 +324,8 @@ export default function Reports() {
 
       {/* Header */}
       <div className="flex items-center gap-2 mb-1">
-        <BarChart3 size={20} className="text-gold shrink-0" />
-        <h1 className="font-display text-xl text-gold font-bold tracking-wide">Rapporter</h1>
+        <BarChart3 size={20} className="text-charcoal shrink-0" />
+        <h1 className="font-display text-xl text-charcoal font-bold tracking-wide">Rapporter</h1>
       </div>
 
       {/* Quick range pills */}
@@ -353,24 +353,24 @@ export default function Reports() {
         <GlassCard className="!p-3">
           <div className="flex gap-3 items-center">
             <div className="flex-1">
-              <label className="block text-[10px] text-slate-500 mb-1">Från</label>
+              <label className="block text-[10px] text-charcoal-muted mb-1">Från</label>
               <input
                 type="date"
                 value={customFrom}
                 onChange={(e) => setCustomFrom(e.target.value)}
                 max={customTo}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold/40"
+                className="w-full bg-cream-light border border-cream-border rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:shadow-focus-warm"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-[10px] text-slate-500 mb-1">Till</label>
+              <label className="block text-[10px] text-charcoal-muted mb-1">Till</label>
               <input
                 type="date"
                 value={customTo}
                 onChange={(e) => setCustomTo(e.target.value)}
                 min={customFrom}
                 max={isoDate(new Date())}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold/40"
+                className="w-full bg-cream-light border border-cream-border rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:shadow-focus-warm"
               />
             </div>
           </div>
@@ -381,18 +381,18 @@ export default function Reports() {
       {(tubs.length > 0 || users.length > 0) && (
         <GlassCard className="!p-3">
           <div className="flex items-center gap-1.5 mb-2">
-            <Filter size={12} className="text-slate-500" />
-            <span className="text-[11px] uppercase tracking-[1.5px] text-slate-500">Filter</span>
+            <Filter size={12} className="text-charcoal-muted" />
+            <span className="text-[11px] uppercase tracking-[1.5px] text-charcoal-muted">Filter</span>
           </div>
           <div className="flex gap-3">
             {/* Tub filter */}
             {tubs.length > 0 && (
               <div className="flex-1">
-                <label className="block text-[10px] text-slate-500 mb-1">Bad</label>
+                <label className="block text-[10px] text-charcoal-muted mb-1">Bad</label>
                 <select
                   value={selectedTubId}
                   onChange={(e) => setSelectedTubId(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-sm text-white focus:outline-none focus:border-gold/40"
+                  className="w-full bg-cream-light border border-cream-border rounded-lg px-2 py-2 text-sm text-charcoal focus:outline-none focus:shadow-focus-warm"
                 >
                   <option value="">Alla bad</option>
                   {tubs.map((t) => (
@@ -405,11 +405,11 @@ export default function Reports() {
             {/* User filter */}
             {users.length > 0 && (
               <div className="flex-1">
-                <label className="block text-[10px] text-slate-500 mb-1">Person</label>
+                <label className="block text-[10px] text-charcoal-muted mb-1">Person</label>
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-2 text-sm text-white focus:outline-none focus:border-gold/40"
+                  className="w-full bg-cream-light border border-cream-border rounded-lg px-2 py-2 text-sm text-charcoal focus:outline-none focus:shadow-focus-warm"
                 >
                   <option value="">Alla</option>
                   {users.map((u) => (
@@ -437,7 +437,7 @@ export default function Reports() {
       <button
         onClick={() => exportCsv(logs)}
         disabled={logs.length === 0}
-        className="w-full flex items-center justify-center gap-2 min-h-[48px] rounded-xl font-semibold text-navy transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 min-h-[48px] rounded-xl font-semibold text-cream-light transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
         style={{
           background: logs.length === 0
             ? 'rgba(232,201,122,0.4)'
@@ -452,7 +452,7 @@ export default function Reports() {
       </button>
 
       {/* Period label */}
-      <p className="text-center text-[11px] text-slate-600">
+      <p className="text-center text-[11px] text-charcoal-muted">
         {new Date(from).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })}
         {' – '}
         {new Date(to).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' })}

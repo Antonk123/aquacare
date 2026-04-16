@@ -95,25 +95,25 @@ function groupByDate(items: ActivityItem[]): { dateLabel: string; items: Activit
 function Avatar({ name }: { name: string }) {
   return (
     <div
-      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center bg-gold/10 border border-gold/20"
+      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center bg-charcoal/5 border border-cream-border"
       aria-hidden="true"
     >
-      <span className="text-gold font-semibold text-[13px] leading-none">{getInitial(name)}</span>
+      <span className="text-charcoal font-semibold text-[13px] leading-none">{getInitial(name)}</span>
     </div>
   )
 }
 
 function ActivityRow({ item }: { item: ActivityItem }) {
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0">
+    <div className="flex items-center gap-3 py-2.5 border-b border-cream-border last:border-0">
       <Avatar name={item.user_name} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-slate-200 font-medium leading-snug truncate">
+        <p className="text-sm text-charcoal font-medium leading-snug truncate">
           {item.user_name}
         </p>
-        <p className="text-xs text-slate-400 truncate">{getActionLabel(item.action)}</p>
+        <p className="text-xs text-charcoal-muted truncate">{getActionLabel(item.action)}</p>
       </div>
-      <div className="flex items-center gap-1 shrink-0 text-slate-500">
+      <div className="flex items-center gap-1 shrink-0 text-charcoal-muted">
         <Clock size={11} />
         <span className="text-[11px]">{formatRelativeTime(item.created_at)}</span>
       </div>
@@ -124,7 +124,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
 function DateGroupSection({ dateLabel, items }: { dateLabel: string; items: ActivityItem[] }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-[1.5px] text-slate-500 mb-2 px-0.5">{dateLabel}</p>
+      <p className="text-[11px] uppercase tracking-[1.5px] text-charcoal-muted mb-2 px-0.5">{dateLabel}</p>
       <GlassCard className="!p-0 overflow-hidden">
         <div className="divide-y-0 px-4">
           {items.map((item) => (
@@ -184,19 +184,19 @@ export default function Activity() {
       <div className="flex items-center gap-2">
         <button
           onClick={() => navigate(-1)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2 text-slate-400 hover:text-slate-200 transition-colors"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2 text-charcoal-muted hover:text-charcoal transition-colors"
           aria-label="Tillbaka"
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="font-display text-xl text-gold font-bold tracking-wide">Aktivitetslogg</h1>
+        <h1 className="font-display text-xl text-charcoal font-bold tracking-wide">Aktivitetslogg</h1>
       </div>
 
       {/* Loading state */}
       {loading && (
         <GlassCard>
           <div className="h-24 flex items-center justify-center">
-            <span className="text-slate-500 text-sm">Laddar aktiviteter...</span>
+            <span className="text-charcoal-muted text-sm">Laddar aktiviteter...</span>
           </div>
         </GlassCard>
       )}
@@ -211,9 +211,9 @@ export default function Activity() {
       {/* Empty state */}
       {!loading && !error && activities.length === 0 && (
         <GlassCard className="text-center py-8">
-          <Clock size={28} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-sm text-slate-400">Ingen aktivitet ännu</p>
-          <p className="text-xs text-slate-600 mt-1">Aktiviteter visas här när du loggar vattentest, bockar uppgifter m.m.</p>
+          <Clock size={28} className="text-charcoal-muted mx-auto mb-3" />
+          <p className="text-sm text-charcoal-muted">Ingen aktivitet ännu</p>
+          <p className="text-xs text-charcoal-muted mt-1">Aktiviteter visas här när du loggar vattentest, bockar uppgifter m.m.</p>
         </GlassCard>
       )}
 
@@ -227,7 +227,7 @@ export default function Activity() {
         <button
           onClick={handleLoadMore}
           disabled={loadingMore}
-          className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl border border-white/10 text-slate-300 text-sm font-medium bg-white/[0.03] hover:bg-white/[0.06] transition-colors duration-200 disabled:opacity-50"
+          className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl border border-cream-border text-charcoal text-sm font-medium bg-charcoal-whisper hover:bg-cream-light transition-colors duration-200 disabled:opacity-50"
         >
           {loadingMore ? 'Laddar...' : 'Visa fler aktiviteter'}
         </button>

@@ -78,8 +78,8 @@ export default function WaterLog() {
             onClick={() => setSelectedTubId('')}
             className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
               selectedTubId === ''
-                ? 'bg-gold/90 text-navy font-semibold'
-                : 'bg-white/5 text-slate-400'
+                ? 'bg-charcoal text-cream-light font-semibold'
+                : 'bg-charcoal-whisper text-charcoal-muted'
             }`}
           >
             Alla
@@ -90,8 +90,8 @@ export default function WaterLog() {
               onClick={() => setSelectedTubId(tub.id)}
               className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
                 selectedTubId === tub.id
-                  ? 'bg-gold/90 text-navy font-semibold'
-                  : 'bg-white/5 text-slate-400'
+                  ? 'bg-charcoal text-cream-light font-semibold'
+                  : 'bg-charcoal-whisper text-charcoal-muted'
               }`}
             >
               {tub.name}

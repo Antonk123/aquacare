@@ -5,6 +5,9 @@ import { GlassCard } from '../components/GlassCard'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 
+const INPUT_CLS = 'w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200'
+const LABEL_CLS = 'block text-[12px] text-charcoal-muted mb-1.5 font-medium tracking-tight'
+
 type Step = 'facility' | 'user' | 'pin'
 
 export default function Login() {
@@ -59,9 +62,9 @@ export default function Login() {
       <div className="max-w-sm mx-auto space-y-4">
         <div className="flex items-center gap-3">
           <button onClick={goBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Tillbaka">
-            <ArrowLeft size={20} className="text-slate-400" />
+            <ArrowLeft size={20} className="text-charcoal-muted" />
           </button>
-          <h1 className="font-display text-xl text-gold font-bold">
+          <h1 className="font-display text-xl text-charcoal font-bold">
             {step === 'facility' ? 'Välj anläggning' : step === 'user' ? 'Välj ditt namn' : 'Ange PIN'}
           </h1>
         </div>
@@ -69,12 +72,12 @@ export default function Login() {
         {step === 'facility' && (
           <div className="space-y-2">
             {facilities.length === 0 ? (
-              <GlassCard className="text-center py-6"><p className="text-sm text-slate-400">Inga anläggningar hittades</p></GlassCard>
+              <GlassCard className="text-center py-6"><p className="text-sm text-charcoal-muted">Inga anläggningar hittades</p></GlassCard>
             ) : facilities.map((f) => (
               <button key={f.id} onClick={() => selectFacility(f)} className="w-full text-left">
                 <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200">
-                  <span className="text-sm font-semibold text-slate-200">{f.name}</span>
-                  <ChevronRight size={16} className="text-slate-500" />
+                  <span className="text-sm font-semibold text-charcoal">{f.name}</span>
+                  <ChevronRight size={16} className="text-charcoal-muted" />
                 </GlassCard>
               </button>
             ))}
@@ -83,14 +86,14 @@ export default function Login() {
 
         {step === 'user' && (
           <div className="space-y-2">
-            <p className="text-xs text-slate-500">{selectedFacility?.name}</p>
+            <p className="text-xs text-charcoal-muted">{selectedFacility?.name}</p>
             {users.length === 0 ? (
-              <GlassCard className="text-center py-6"><p className="text-sm text-slate-400">Inga användare hittades</p></GlassCard>
+              <GlassCard className="text-center py-6"><p className="text-sm text-charcoal-muted">Inga användare hittades</p></GlassCard>
             ) : users.map((u) => (
               <button key={u.id} onClick={() => selectUser(u)} className="w-full text-left">
                 <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200">
-                  <span className="text-sm font-semibold text-slate-200">{u.name}</span>
-                  <ChevronRight size={16} className="text-slate-500" />
+                  <span className="text-sm font-semibold text-charcoal">{u.name}</span>
+                  <ChevronRight size={16} className="text-charcoal-muted" />
                 </GlassCard>
               </button>
             ))}
@@ -99,13 +102,13 @@ export default function Login() {
 
         {step === 'pin' && (
           <form onSubmit={handleLogin} className="space-y-3">
-            <p className="text-xs text-slate-500">{selectedFacility?.name} — {selectedUser?.name}</p>
+            <p className="text-xs text-charcoal-muted">{selectedFacility?.name} — {selectedUser?.name}</p>
             <GlassCard>
-              <label className="block text-xs text-slate-400 mb-1.5 font-medium">PIN-kod</label>
-              <input type="password" inputMode="numeric" maxLength={4} value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="••••" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 text-center tracking-[8px] placeholder:tracking-[4px] placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" autoFocus />
+              <label className={LABEL_CLS}>PIN-kod</label>
+              <input type="password" inputMode="numeric" maxLength={4} value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="••••" className={`${INPUT_CLS} text-center tracking-[8px] placeholder:tracking-[4px]`} autoFocus />
             </GlassCard>
             {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-            <button type="submit" disabled={loading} className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-[14px] font-bold text-[15px] tracking-wide shadow-[0_4px_16px_rgba(232,201,122,0.2)] transition-transform duration-200 active:scale-[0.98] disabled:opacity-50">
+            <button type="submit" disabled={loading} className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-charcoal text-cream-light shadow-inset-btn rounded-[14px] font-bold text-[15px] tracking-wide transition-transform duration-200 active:scale-[0.98] disabled:opacity-50">
               <LogIn size={18} strokeWidth={2.5} />
               {loading ? 'Loggar in...' : 'Logga in'}
             </button>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Save, LogOut, Users, Copy, RefreshCw, Shield, Trash2, Waves, Pencil, Plus, X, Check, FileText, ChevronRight, BarChart3, Table, Clock } from 'lucide-react'
+import { ArrowLeft, Save, LogOut, Users, Copy, RefreshCw, Shield, Trash2, Waves, Pencil, Plus, X, Check } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useSettings } from '../hooks/useSettings'
@@ -154,17 +153,17 @@ export default function Settings() {
     <div className="p-5 space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Tillbaka">
-          <ArrowLeft size={20} className="text-slate-400" />
+          <ArrowLeft size={20} className="text-charcoal-muted" />
         </button>
-        <h1 className="font-display text-xl text-gold font-bold">Inställningar</h1>
+        <h1 className="font-display text-xl text-charcoal font-bold">Inställningar</h1>
       </div>
 
       {/* User info */}
       <GlassCard>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-semibold text-slate-200">{user?.name}</div>
-            <div className="text-xs text-slate-400">{facility?.name} — {user?.role === 'admin' ? 'Admin' : 'Personal'}</div>
+            <div className="text-sm font-semibold text-charcoal">{user?.name}</div>
+            <div className="text-xs text-charcoal-muted">{facility?.name} — {user?.role === 'admin' ? 'Admin' : 'Personal'}</div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-1.5 min-h-[44px] px-3 text-red-400 text-sm font-medium">
             <LogOut size={16} />
@@ -175,111 +174,72 @@ export default function Settings() {
 
       {/* Local settings */}
       <form onSubmit={handleSave} className="space-y-3">
-        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium">Lokala inställningar</div>
+        <div className="text-[11px] text-charcoal-muted uppercase tracking-wider font-medium">Lokala inställningar</div>
         <GlassCard>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 font-medium">Spa-namn</label>
-              <input type="text" value={spaName} onChange={(e) => setSpaName(e.target.value)} placeholder="MSpa Bristol Urban" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
+              <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Spa-namn</label>
+              <input type="text" value={spaName} onChange={(e) => setSpaName(e.target.value)} placeholder="MSpa Bristol Urban" className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200" />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 font-medium">Vattenvolym (liter)</label>
-              <input type="text" inputMode="numeric" value={volume} onChange={(e) => setVolume(e.target.value)} placeholder="1000" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
+              <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Vattenvolym (liter)</label>
+              <input type="text" inputMode="numeric" value={volume} onChange={(e) => setVolume(e.target.value)} placeholder="1000" className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200" />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 font-medium">Vattenbytescykel (dagar)</label>
-              <input type="text" inputMode="numeric" value={cycleDays} onChange={(e) => setCycleDays(e.target.value)} placeholder="90" className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200" />
-              <span className="text-[11px] text-slate-500 mt-1 block">Nuvarande cykel: {formatSwedishDecimal(settings.waterChangeCycleDays)} dagar</span>
+              <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Vattenbytescykel (dagar)</label>
+              <input type="text" inputMode="numeric" value={cycleDays} onChange={(e) => setCycleDays(e.target.value)} placeholder="90" className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200" />
+              <span className="text-[11px] text-charcoal-muted mt-1 block">Nuvarande cykel: {formatSwedishDecimal(settings.waterChangeCycleDays)} dagar</span>
             </div>
           </div>
         </GlassCard>
-        <button type="submit" className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-[14px] font-bold text-[15px] tracking-wide shadow-[0_4px_16px_rgba(232,201,122,0.2)] transition-transform duration-200 active:scale-[0.98]">
+        <button type="submit" className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-charcoal text-cream-light shadow-inset-btn rounded-[14px] font-bold text-[15px] tracking-wide transition-transform duration-200 active:scale-[0.98]">
           <Save size={18} strokeWidth={2.5} />
           {saved ? 'Sparat!' : 'Spara inställningar'}
         </button>
       </form>
 
-      {/* Quick links */}
-      <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium">Övrigt</div>
-      <Link to="/noteringar">
-        <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200">
-          <div className="flex items-center gap-3">
-            <FileText size={18} className="text-gold" />
-            <span className="text-sm font-semibold text-slate-200">Noteringar</span>
-          </div>
-          <ChevronRight size={16} className="text-slate-500" />
-        </GlassCard>
-      </Link>
-      <Link to="/kalkyl">
-        <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200 mt-2">
-          <div className="flex items-center gap-3">
-            <Table size={18} className="text-gold" />
-            <span className="text-sm font-semibold text-slate-200">Kalkylator</span>
-          </div>
-          <ChevronRight size={16} className="text-slate-500" />
-        </GlassCard>
-      </Link>
-      <Link to="/rapporter">
-        <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200 mt-2">
-          <div className="flex items-center gap-3">
-            <BarChart3 size={18} className="text-gold" />
-            <span className="text-sm font-semibold text-slate-200">Rapporter</span>
-          </div>
-          <ChevronRight size={16} className="text-slate-500" />
-        </GlassCard>
-      </Link>
-      <Link to="/aktivitet">
-        <GlassCard className="flex items-center justify-between active:scale-[0.98] transition-transform duration-200 mt-2">
-          <div className="flex items-center gap-3">
-            <Clock size={18} className="text-gold" />
-            <span className="text-sm font-semibold text-slate-200">Aktivitetslogg</span>
-          </div>
-          <ChevronRight size={16} className="text-slate-500" />
-        </GlassCard>
-      </Link>
-
       {/* Admin section */}
       {isAdmin && (
         <>
-          <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium pt-2">Administration</div>
+          <div className="text-[11px] text-charcoal-muted uppercase tracking-wider font-medium pt-2">Administration</div>
           <GlassCard>
             <div className="flex items-center gap-2 mb-2">
-              <Users size={14} className="text-gold" />
-              <span className="text-xs text-gold font-semibold uppercase tracking-wider">Inbjudningskod</span>
+              <Users size={14} className="text-charcoal-muted" />
+              <span className="text-xs text-charcoal-muted font-semibold uppercase tracking-wider">Inbjudningskod</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] flex items-center text-lg font-mono text-slate-200 tracking-[4px]">
+              <div className="flex-1 bg-cream-light border border-cream-border rounded-xl px-3.5 min-h-[48px] flex items-center text-lg font-mono text-charcoal tracking-[4px]">
                 {inviteCode}
               </div>
-              <button onClick={copyCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-white/5 border border-white/10 rounded-xl" aria-label="Kopiera">
-                <Copy size={16} className={codeCopied ? 'text-status-ok' : 'text-slate-400'} />
+              <button onClick={copyCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-cream-light border border-cream-border rounded-xl" aria-label="Kopiera">
+                <Copy size={16} className={codeCopied ? 'text-status-ok' : 'text-charcoal-muted'} />
               </button>
-              <button onClick={handleRegenerateCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-white/5 border border-white/10 rounded-xl" aria-label="Generera ny kod">
-                <RefreshCw size={16} className="text-slate-400" />
+              <button onClick={handleRegenerateCode} className="min-w-[48px] min-h-[48px] flex items-center justify-center bg-cream-light border border-cream-border rounded-xl" aria-label="Generera ny kod">
+                <RefreshCw size={16} className="text-charcoal-muted" />
               </button>
             </div>
-            <p className="text-[11px] text-slate-500 mt-2">Dela koden med personal som ska gå med i anläggningen.</p>
+            <p className="text-[11px] text-charcoal-muted mt-2">Dela koden med personal som ska gå med i anläggningen.</p>
           </GlassCard>
 
           <GlassCard>
             <div className="flex items-center gap-2 mb-3">
-              <Users size={14} className="text-gold" />
-              <span className="text-xs text-gold font-semibold uppercase tracking-wider">Personal ({users.length})</span>
+              <Users size={14} className="text-charcoal-muted" />
+              <span className="text-xs text-charcoal-muted font-semibold uppercase tracking-wider">Personal ({users.length})</span>
             </div>
             <div className="space-y-2">
               {users.map((u) => (
                 <div key={u.id} className="flex items-center justify-between py-1">
                   <div>
-                    <span className="text-sm text-slate-200">{u.name}</span>
-                    <span className="text-[10px] text-slate-500 ml-2">{u.role === 'admin' ? 'Admin' : 'Personal'}</span>
+                    <span className="text-sm text-charcoal">{u.name}</span>
+                    <span className="text-[10px] text-charcoal-muted ml-2">{u.role === 'admin' ? 'Admin' : 'Personal'}</span>
                   </div>
                   {u.id !== user?.id && (
                     <div className="flex items-center gap-1">
                       <button onClick={() => handleToggleRole(u.id, u.role)} className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg" aria-label="Ändra roll">
-                        <Shield size={14} className="text-slate-600" />
+                        <Shield size={14} className="text-charcoal-muted" />
                       </button>
                       <button onClick={() => setDeleteUserId(u.id)} className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg" aria-label="Ta bort">
-                        <Trash2 size={14} className="text-slate-600" />
+                        <Trash2 size={14} className="text-charcoal-muted" />
                       </button>
                     </div>
                   )}
@@ -292,13 +252,13 @@ export default function Settings() {
           <GlassCard>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Waves size={14} className="text-gold" />
-                <span className="text-xs text-gold font-semibold uppercase tracking-wider">Bad ({tubs.length})</span>
+                <Waves size={14} className="text-charcoal-muted" />
+                <span className="text-xs text-charcoal-muted font-semibold uppercase tracking-wider">Bad ({tubs.length})</span>
               </div>
               {!showTubForm && (
                 <button
                   onClick={openAddTub}
-                  className="flex items-center gap-1 min-h-[32px] px-2.5 bg-gold/10 border border-gold/20 text-gold rounded-lg text-[12px] font-semibold"
+                  className="flex items-center gap-1 min-h-[32px] px-2.5 bg-charcoal/5 border border-cream-border text-charcoal-muted rounded-lg text-[12px] font-semibold"
                 >
                   <Plus size={12} strokeWidth={2.5} />
                   Lägg till bad
@@ -312,8 +272,8 @@ export default function Settings() {
                 {tubs.map((tub) => (
                   <div key={tub.id} className="flex items-center justify-between py-1">
                     <div>
-                      <span className="text-sm text-slate-200">{tub.name}</span>
-                      <span className="text-[10px] text-slate-500 ml-2">{tub.volume} L · {tub.sanitizer === 'klor' ? 'Klor' : 'Brom'}</span>
+                      <span className="text-sm text-charcoal">{tub.name}</span>
+                      <span className="text-[10px] text-charcoal-muted ml-2">{tub.volume} L · {tub.sanitizer === 'klor' ? 'Klor' : 'Brom'}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
@@ -321,14 +281,14 @@ export default function Settings() {
                         className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg"
                         aria-label="Redigera bad"
                       >
-                        <Pencil size={14} className="text-slate-600" />
+                        <Pencil size={14} className="text-charcoal-muted" />
                       </button>
                       <button
                         onClick={() => setDeleteTubId(tub.id)}
                         className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg"
                         aria-label="Arkivera bad"
                       >
-                        <Trash2 size={14} className="text-slate-600" />
+                        <Trash2 size={14} className="text-charcoal-muted" />
                       </button>
                     </div>
                   </div>
@@ -337,28 +297,28 @@ export default function Settings() {
             )}
 
             {tubs.length === 0 && !showTubForm && (
-              <p className="text-[11px] text-slate-500 mb-3">Inga bad tillagda ännu.</p>
+              <p className="text-[11px] text-charcoal-muted mb-3">Inga bad tillagda ännu.</p>
             )}
 
             {/* Inline add/edit form */}
             {showTubForm && (
               <form onSubmit={handleSaveTub} className="space-y-3 mt-2">
-                <div className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                <div className="text-[11px] text-charcoal-muted font-semibold uppercase tracking-wider">
                   {editingTubId ? 'Redigera bad' : 'Nytt bad'}
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">Namn</label>
+                  <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Namn</label>
                   <input
                     type="text"
                     value={tubForm.name}
                     onChange={(e) => setTubForm((f) => ({ ...f, name: e.target.value }))}
                     placeholder="MSpa Bristol Urban"
                     required
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                    className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">Volym (liter)</label>
+                  <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Volym (liter)</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -366,15 +326,15 @@ export default function Settings() {
                     onChange={(e) => setTubForm((f) => ({ ...f, volume: e.target.value }))}
                     placeholder="1000"
                     required
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                    className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">Desinfektionsmedel</label>
+                  <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">Desinfektionsmedel</label>
                   <select
                     value={tubForm.sanitizer}
                     onChange={(e) => setTubForm((f) => ({ ...f, sanitizer: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 focus:outline-none focus:border-gold/40 transition-colors duration-200 [color-scheme:dark]"
+                    className="w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal focus:outline-none focus:shadow-focus-warm transition-shadow duration-200"
                   >
                     <option value="klor">Klor</option>
                     <option value="brom">Brom</option>
@@ -383,15 +343,15 @@ export default function Settings() {
 
                 {/* Custom ranges */}
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    Gränsvärden <span className="text-slate-500">(lämna tomt för standard)</span>
+                  <label className="block text-xs text-charcoal-muted mb-1.5 font-medium">
+                    Gränsvärden <span className="text-charcoal-muted">(lämna tomt för standard)</span>
                   </label>
                   <div className="space-y-2">
                     {OPTIMAL_RANGES.filter(r => r.key !== 'waterTemp').map((range) => {
                       const custom = tubForm.customRanges[range.key as string] || {}
                       return (
                         <div key={range.key} className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-400 w-16 flex-shrink-0">{range.label}</span>
+                          <span className="text-[11px] text-charcoal-muted w-16 flex-shrink-0">{range.label}</span>
                           <input
                             type="text"
                             inputMode="decimal"
@@ -401,9 +361,9 @@ export default function Settings() {
                               ...f,
                               customRanges: { ...f.customRanges, [range.key]: { ...f.customRanges[range.key as string], min: e.target.value } }
                             }))}
-                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-2 min-h-[36px] text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40"
+                            className="flex-1 bg-cream-light border border-cream-border rounded-lg px-2 min-h-[36px] text-sm text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm"
                           />
-                          <span className="text-[10px] text-slate-600">–</span>
+                          <span className="text-[10px] text-charcoal-muted">–</span>
                           <input
                             type="text"
                             inputMode="decimal"
@@ -413,9 +373,9 @@ export default function Settings() {
                               ...f,
                               customRanges: { ...f.customRanges, [range.key]: { ...f.customRanges[range.key as string], max: e.target.value } }
                             }))}
-                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-2 min-h-[36px] text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-gold/40"
+                            className="flex-1 bg-cream-light border border-cream-border rounded-lg px-2 min-h-[36px] text-sm text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm"
                           />
-                          {range.unit && <span className="text-[10px] text-slate-500 w-10 flex-shrink-0">{range.unit}</span>}
+                          {range.unit && <span className="text-[10px] text-charcoal-muted w-10 flex-shrink-0">{range.unit}</span>}
                         </div>
                       )
                     })}
@@ -426,7 +386,7 @@ export default function Settings() {
                   <button
                     type="submit"
                     disabled={tubSaving}
-                    className="flex-1 flex items-center justify-center gap-1.5 min-h-[44px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-xl font-bold text-[13px] disabled:opacity-60"
+                    className="flex-1 flex items-center justify-center gap-1.5 min-h-[44px] bg-charcoal text-cream-light shadow-inset-btn rounded-xl font-bold text-[13px] disabled:opacity-60"
                   >
                     <Check size={14} strokeWidth={2.5} />
                     {tubSaving ? 'Sparar…' : editingTubId ? 'Uppdatera' : 'Spara bad'}
@@ -434,10 +394,10 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={cancelTubForm}
-                    className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/5 border border-white/10 rounded-xl"
+                    className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-cream-light border border-cream-border rounded-xl"
                     aria-label="Avbryt"
                   >
-                    <X size={16} className="text-slate-400" />
+                    <X size={16} className="text-charcoal-muted" />
                   </button>
                 </div>
               </form>
