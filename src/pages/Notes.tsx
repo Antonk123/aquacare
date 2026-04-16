@@ -179,6 +179,7 @@ export default function Notes() {
             ))}
           </div>
         </>
+      )}
 
       {deleteId && (
         <ConfirmDialog
