@@ -32,11 +32,13 @@ export function WaterAge({ tubId }: { tubId?: string }) {
     return (
       <button
         onClick={markWaterChange}
-        className="flex flex-col items-center justify-center bg-glass-surface border border-glass-border rounded-2xl p-3 transition-all duration-200 active:scale-[0.98] w-full"
+        className="flex flex-col items-center justify-center bg-cream border border-cream-border rounded-xl p-3 transition-all duration-200 active:opacity-80 w-full"
       >
-        <Droplets size={18} className="text-gold mb-1" />
-        <div className="text-[11px] text-gold font-semibold">Markera vattenbyte</div>
-        <div className="text-[10px] text-slate-500 mt-0.5">Starta spårning</div>
+        <Droplets size={18} className="text-charcoal mb-1" strokeWidth={1.75} />
+        <div className="text-[11px] text-charcoal font-semibold tracking-tight">
+          Markera vattenbyte
+        </div>
+        <div className="text-[10px] text-charcoal-muted mt-0.5">Starta spårning</div>
       </button>
     )
   }
@@ -50,13 +52,19 @@ export function WaterAge({ tubId }: { tubId?: string }) {
   return (
     <button
       onClick={markWaterChange}
-      className="flex flex-col items-center justify-center bg-glass-surface border border-glass-border rounded-2xl p-3 transition-all duration-200 active:scale-[0.98] w-full"
+      className="flex flex-col items-center justify-center bg-cream border border-cream-border rounded-xl p-3 transition-all duration-200 active:opacity-80 w-full"
     >
-      <div className="text-[10px] text-slate-500 mb-0.5">Vattenålder</div>
-      <div className={`text-lg font-bold ${urgent ? 'text-status-warn' : 'text-gold'}`}>
+      <div className="text-[10px] text-charcoal-muted mb-0.5 uppercase tracking-[1.5px]">
+        Vattenålder
+      </div>
+      <div
+        className={`text-lg font-semibold tracking-tight tabular-nums ${
+          urgent ? 'text-status-warn' : 'text-charcoal'
+        }`}
+      >
         {daysSince} dagar
       </div>
-      <div className="text-[10px] text-slate-500 mt-0.5">
+      <div className="text-[10px] text-charcoal-muted mt-0.5">
         {daysLeft > 0 ? `Byte om ~${daysLeft}d` : 'Dags att byta!'}
       </div>
     </button>

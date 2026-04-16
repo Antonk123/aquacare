@@ -80,11 +80,13 @@ export function SmartStatus({ latest }: { latest: WaterLogEntry | undefined }) {
   if (!latest) {
     return (
       <div className="text-center py-6">
-        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-glass-surface border-2 border-glass-border mb-3">
-          <Droplets size={28} className="text-slate-400" />
+        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-cream border border-cream-border mb-3">
+          <Droplets size={28} className="text-charcoal-muted" strokeWidth={1.75} />
         </div>
-        <div className="text-sm text-slate-300 font-medium">Välkommen till AquaCare</div>
-        <div className="text-xs text-slate-500 mt-1">Logga ditt första vattentest</div>
+        <div className="text-base text-charcoal font-medium tracking-tight">
+          Välkommen till AquaCare
+        </div>
+        <div className="text-xs text-charcoal-muted mt-1">Logga ditt första vattentest</div>
       </div>
     )
   }
@@ -94,36 +96,45 @@ export function SmartStatus({ latest }: { latest: WaterLogEntry | undefined }) {
   if (!rec) {
     return (
       <div className="text-center py-4">
-        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-status-ok/15 to-status-ok/5 border-2 border-status-ok/30 mb-3 shadow-[0_0_24px_rgba(74,222,128,0.1)]">
-          <Check size={32} className="text-status-ok" strokeWidth={2.5} />
+        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-status-ok/10 border border-status-ok/30 mb-3">
+          <Check size={30} className="text-status-ok" strokeWidth={2.2} />
         </div>
-        <div className="text-sm text-status-ok font-semibold">Vattnet mår bra</div>
-        <div className="text-xs text-slate-500 mt-1">Senast testad · {formatTimeAgo(latest.date)}</div>
+        <div className="text-base text-status-ok font-semibold tracking-tight">
+          Vattnet mår bra
+        </div>
+        <div className="text-[11px] text-charcoal-muted mt-1">
+          Senast testad · {formatTimeAgo(latest.date)}
+        </div>
       </div>
     )
   }
 
   const isError = rec.level === 'error'
-  const color = isError ? 'status-error' : 'status-warn'
-  const glowColor = isError ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.1)'
   const Icon = isError ? AlertCircle : AlertTriangle
+  const containerCls = isError
+    ? 'bg-status-error/10 border-status-error/30'
+    : 'bg-status-warn/10 border-status-warn/30'
+  const textCls = isError ? 'text-status-error' : 'text-status-warn'
 
   return (
     <div className="text-center py-4">
       <div
-        className={`inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-${color}/15 to-${color}/5 border-2 border-${color}/30 mb-3`}
-        style={{ boxShadow: `0 0 24px ${glowColor}` }}
+        className={`inline-flex items-center justify-center w-[72px] h-[72px] rounded-full border mb-3 ${containerCls}`}
       >
-        <Icon size={28} className={`text-${color}`} />
+        <Icon size={28} className={textCls} strokeWidth={2} />
       </div>
-      <div className={`text-sm text-${color} font-semibold`}>{rec.label} är {rec.direction}</div>
+      <div className={`text-base font-semibold tracking-tight ${textCls}`}>
+        {rec.label} är {rec.direction}
+      </div>
       {rec.dosage && (
-        <div className="text-sm text-slate-200 mt-2">{rec.dosage}</div>
+        <div className="text-sm text-charcoal mt-2 font-medium">{rec.dosage}</div>
       )}
       {rec.instruction && (
-        <div className="text-[11px] text-slate-400 mt-1">{rec.instruction}</div>
+        <div className="text-[11px] text-charcoal-muted mt-1">{rec.instruction}</div>
       )}
-      <div className="text-[11px] text-slate-500 mt-2">Baserat på test · {formatTimeAgo(latest.date)}</div>
+      <div className="text-[11px] text-charcoal-muted mt-2">
+        Baserat på test · {formatTimeAgo(latest.date)}
+      </div>
     </div>
   )
 }

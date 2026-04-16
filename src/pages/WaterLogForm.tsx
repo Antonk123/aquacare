@@ -30,6 +30,11 @@ const STRIP_LABELS: Record<string, string> = {
   totalAlkalinity: 'Alkalinitet',
 }
 
+const INPUT_CLS =
+  'w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200'
+
+const LABEL_CLS = 'block text-[12px] text-charcoal-muted mb-1.5 font-medium tracking-tight'
+
 export default function WaterLogForm() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
@@ -131,15 +136,15 @@ export default function WaterLogForm() {
 
   return (
     <div className="p-5 space-y-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={() => navigate(-1)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md hover:bg-charcoal-hover transition-colors"
           aria-label="Tillbaka"
         >
-          <ArrowLeft size={20} className="text-slate-400" />
+          <ArrowLeft size={20} className="text-charcoal" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display text-xl text-gold font-bold">
+        <h1 className="font-display text-[24px] leading-none font-semibold text-charcoal tracking-[-0.03em]">
           {isEditing ? 'Redigera loggning' : 'Ny loggning'}
         </h1>
       </div>
@@ -162,19 +167,25 @@ export default function WaterLogForm() {
         <>
           {/* Strip reader button or summary */}
           {!isEditing && (stripDone && hasStripValues ? (
-            <GlassCard className="!bg-status-ok/6 !border-status-ok/15">
+            <GlassCard className="bg-status-ok/5 border-status-ok/20">
               <div className="flex items-center gap-2 mb-2">
-                <Check size={14} className="text-status-ok" strokeWidth={3} />
-                <span className="text-xs text-status-ok font-semibold uppercase tracking-wider">Avläsning klar</span>
+                <Check size={14} className="text-status-ok" strokeWidth={2.5} />
+                <span className="text-[11px] text-status-ok font-medium uppercase tracking-[1.5px]">
+                  Avläsning klar
+                </span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 {STRIP_KEYS.map((key) => {
                   const val = values[key]
                   if (!val) return null
                   return (
                     <div key={key} className="text-center">
-                      <div className="text-lg font-bold text-slate-200">{val}</div>
-                      <div className="text-[10px] text-slate-400">{STRIP_LABELS[key]}</div>
+                      <div className="text-lg font-semibold text-charcoal tabular-nums tracking-tight">
+                        {val}
+                      </div>
+                      <div className="text-[10px] text-charcoal-muted">
+                        {STRIP_LABELS[key]}
+                      </div>
                     </div>
                   )
                 })}
@@ -182,7 +193,7 @@ export default function WaterLogForm() {
               <button
                 type="button"
                 onClick={() => setShowStrip(true)}
-                className="text-[11px] text-gold mt-2 font-medium"
+                className="text-[12px] text-charcoal mt-3 font-medium underline underline-offset-2"
               >
                 Gör om avläsning
               </button>
@@ -191,9 +202,9 @@ export default function WaterLogForm() {
             <button
               type="button"
               onClick={() => setShowStrip(true)}
-              className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gold/10 border border-gold/20 text-gold rounded-xl font-semibold text-[13px] transition-all duration-200 active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-cream border border-charcoal-line text-charcoal rounded-md font-medium text-[14px] tracking-tight transition-opacity duration-200 active:opacity-80"
             >
-              <Pipette size={16} strokeWidth={2.5} />
+              <Pipette size={16} strokeWidth={1.75} />
               Avläs teststicka
             </button>
           ))}
@@ -222,21 +233,22 @@ export default function WaterLogForm() {
 
             {/* Note field */}
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                Anteckning <span className="text-slate-500">(valfritt)</span>
+              <label className={LABEL_CLS}>
+                Anteckning{' '}
+                <span className="text-charcoal-muted/70 font-normal">(valfritt)</span>
               </label>
               <input
                 type="text"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="T.ex. Chockbehandling, säsongsstart"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-gold/40 transition-colors duration-200"
+                className={INPUT_CLS}
               />
             </div>
 
             {/* Extra fields — collapsed if strip was used */}
             {!isEditing && stripDone && hasStripValues && (
-              <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium pt-1">
+              <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-1">
                 Övriga värden (valfritt)
               </div>
             )}
@@ -247,7 +259,7 @@ export default function WaterLogForm() {
                 const error = errors[field.key]
                 return (
                   <div key={field.key} className={field.key === 'waterTemp' ? 'col-span-2' : ''}>
-                    <label className="block text-xs text-slate-400 mb-1.5 font-medium">{field.label}</label>
+                    <label className={LABEL_CLS}>{field.label}</label>
                     <input
                       type="text"
                       inputMode="decimal"
@@ -257,14 +269,12 @@ export default function WaterLogForm() {
                         setValues((prev) => ({ ...prev, [field.key]: e.target.value }))
                         if (errors[field.key]) setErrors((prev) => { const n = { ...prev }; delete n[field.key]; return n })
                       }}
-                      className={`w-full bg-white/5 border rounded-xl px-3.5 min-h-[48px] text-base text-slate-200 placeholder:text-slate-500 focus:outline-none transition-colors duration-200 ${
-                        error ? 'border-red-500/50 focus:border-red-500/70' : 'border-white/10 focus:border-gold/40'
-                      }`}
+                      className={`${INPUT_CLS} ${error ? '!border-status-error/50 !shadow-none' : ''}`}
                     />
                     {error ? (
-                      <span className="text-[11px] text-red-400 mt-1 block">{error}</span>
+                      <span className="text-[11px] text-status-error mt-1 block">{error}</span>
                     ) : range ? (
-                      <span className="text-[11px] text-slate-600 mt-1 block">{range.min}–{range.max}</span>
+                      <span className="text-[11px] text-charcoal-muted/70 mt-1 block">{range.min}–{range.max}</span>
                     ) : null}
                   </div>
                 )
@@ -273,9 +283,9 @@ export default function WaterLogForm() {
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-gradient-to-br from-gold to-gold-dark text-navy rounded-[14px] font-bold text-[15px] tracking-wide shadow-[0_4px_16px_rgba(232,201,122,0.2)] transition-transform duration-200 active:scale-[0.98] mt-4"
+              className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-charcoal text-cream-light rounded-md font-medium text-[15px] tracking-tight shadow-inset-btn transition-opacity duration-200 active:opacity-80 mt-4"
             >
-              <Save size={18} strokeWidth={2.5} />
+              <Save size={18} strokeWidth={2} />
               {isEditing ? 'Uppdatera loggning' : 'Spara loggning'}
             </button>
           </form>

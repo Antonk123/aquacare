@@ -53,14 +53,16 @@ export default function WaterLog() {
   }
 
   return (
-    <div className="p-5 space-y-3">
+    <div className="p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-xl text-gold font-bold">Vattenlogg</h1>
+        <h1 className="font-display text-[28px] leading-none font-semibold text-charcoal tracking-[-0.035em]">
+          Vattenlogg
+        </h1>
         <Link
           to="/logg/ny"
-          className="flex items-center gap-1.5 bg-gradient-to-br from-gold to-gold-dark text-navy rounded-xl px-4 font-bold text-[13px] min-h-[44px]"
+          className="flex items-center gap-1.5 bg-charcoal text-cream-light rounded-md px-4 font-medium text-[13px] min-h-[40px] tracking-tight shadow-inset-btn active:opacity-80 transition-opacity"
         >
-          <Plus size={16} strokeWidth={2.5} />
+          <Plus size={16} strokeWidth={2} />
           Ny loggning
         </Link>
       </div>
@@ -100,17 +102,21 @@ export default function WaterLog() {
 
       <GlassCard>
         <div className="flex items-center gap-1.5 mb-2">
-          <Info size={14} className="text-gold" />
-          <span className="text-[11px] text-gold uppercase tracking-wider font-semibold">Optimala värden</span>
+          <Info size={14} className="text-charcoal-muted" strokeWidth={1.75} />
+          <span className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium">
+            Optimala värden
+          </span>
         </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
           {OPTIMAL_RANGES.map((r) => (
-            <div key={r.key} className="flex justify-between">
-              <span className="text-slate-400">{r.label}</span>
-              <span className="text-slate-300">
+            <div key={r.key} className="flex justify-between items-baseline">
+              <span className="text-charcoal-muted">{r.label}</span>
+              <span className="text-charcoal font-medium tabular-nums">
                 {r.min !== undefined ? formatSwedishDecimal(r.min) : ''}
                 {r.min !== undefined && r.max !== undefined ? ' – ' : ''}
-                {r.max !== undefined ? `${r.min === undefined ? '< ' : ''}${formatSwedishDecimal(r.max)}` : ''}
+                {r.max !== undefined
+                  ? `${r.min === undefined ? '< ' : ''}${formatSwedishDecimal(r.max)}`
+                  : ''}
                 {r.unit ? ` ${r.unit}` : ''}
               </span>
             </div>
@@ -118,62 +124,69 @@ export default function WaterLog() {
         </div>
       </GlassCard>
 
-      <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium">Senaste loggningar</div>
+      <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-1">
+        Senaste loggningar
+      </div>
 
       {filtered.length === 0 ? (
-        <GlassCard className="text-center py-6">
-          <p className="text-sm text-slate-400">Inga loggningar ännu</p>
+        <GlassCard className="text-center py-8">
+          <p className="text-sm text-charcoal-muted">Inga loggningar ännu</p>
         </GlassCard>
       ) : (
         <div className="space-y-2">
           {filtered.map((entry) => {
             const { status, warnings } = getEntryStatus(entry)
             return (
-              <GlassCard key={entry.id} className="!bg-glass-surface/70">
+              <GlassCard key={entry.id}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13px] text-slate-300 font-semibold">{formatDate(entry.date)}</span>
+                    <span className="text-[13px] text-charcoal font-medium tracking-tight">{formatDate(entry.date)}</span>
                     {entry.tubName && (
-                      <span className="text-[10px] bg-gold/10 text-gold px-2 py-0.5 rounded-lg font-medium">{entry.tubName}</span>
+                      <span className="text-[10px] bg-charcoal/5 text-charcoal-muted px-2 py-0.5 rounded-md font-medium">{entry.tubName}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                  {status === 'ok' ? (
-                    <span className="inline-flex items-center gap-1 bg-status-ok/12 text-status-ok text-[10px] px-2 py-0.5 rounded-lg font-semibold">
-                      <Check size={10} strokeWidth={3} />
-                      Alla optimala
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 bg-status-alert/12 text-status-alert text-[10px] px-2 py-0.5 rounded-lg font-semibold">
-                      <AlertTriangle size={10} strokeWidth={3} />
-                      {warnings} varning{warnings > 1 ? 'ar' : ''}
-                    </span>
-                  )}
-                  <Link
-                    to={`/logg/redigera/${entry.id}`}
-                    className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg transition-colors duration-200 active:scale-95"
-                    aria-label="Redigera loggning"
-                  >
-                    <Pencil size={14} className="text-slate-600" />
-                  </Link>
-                  <button
-                    onClick={() => setDeleteId(entry.id)}
-                    className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg transition-colors duration-200 active:scale-95"
-                    aria-label="Ta bort loggning"
-                  >
-                    <Trash2 size={14} className="text-slate-600" />
-                  </button>
+                    {status === 'ok' ? (
+                      <span className="inline-flex items-center gap-1 bg-status-ok/10 text-status-ok text-[10px] px-2 py-0.5 rounded-md font-medium">
+                        <Check size={10} strokeWidth={2.5} />
+                        Alla optimala
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-status-alert/10 text-status-alert text-[10px] px-2 py-0.5 rounded-md font-medium">
+                        <AlertTriangle size={10} strokeWidth={2.5} />
+                        {warnings} varning{warnings > 1 ? 'ar' : ''}
+                      </span>
+                    )}
+                    <Link
+                      to={`/logg/redigera/${entry.id}`}
+                      className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
+                      aria-label="Redigera loggning"
+                    >
+                      <Pencil size={14} className="text-charcoal-muted" strokeWidth={1.75} />
+                    </Link>
+                    <button
+                      onClick={() => setDeleteId(entry.id)}
+                      className="min-w-[32px] min-h-[32px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
+                      aria-label="Ta bort loggning"
+                    >
+                      <Trash2 size={14} className="text-charcoal-muted" strokeWidth={1.75} />
+                    </button>
                   </div>
                 </div>
                 {entry.note && (
-                  <p className="text-xs text-slate-400 italic mb-2">{entry.note}</p>
+                  <p className="text-xs text-charcoal-muted italic mb-2">{entry.note}</p>
                 )}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {OPTIMAL_RANGES.map((range) => {
                     const val = entry[range.key] as number | undefined
                     if (val === undefined) return null
                     return (
-                      <ValueBadge key={range.key} label={range.label} value={val} status={getValueStatus(range, val)} />
+                      <ValueBadge
+                        key={range.key}
+                        label={range.label}
+                        value={val}
+                        status={getValueStatus(range, val)}
+                      />
                     )
                   })}
                 </div>

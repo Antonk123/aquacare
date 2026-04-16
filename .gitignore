@@ -5,3 +5,5 @@ dist
 .superpowers/
 data/
 server-dist/
+.DS_Store
+**/.DS_Store

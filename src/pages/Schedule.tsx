@@ -14,21 +14,29 @@ export default function Schedule() {
   const tasks = SCHEDULE_TASKS[activePeriod]
 
   return (
-    <div className="p-5 space-y-4">
-      <h1 className="font-display text-xl text-gold font-bold">Underhåll</h1>
+    <div className="p-5 space-y-5">
+      <h1 className="font-display text-[28px] leading-none font-semibold text-charcoal tracking-[-0.035em]">
+        Underhåll
+      </h1>
 
-      <ProgressRing
-        percent={progress.percent}
-        label={`${progress.done} av ${progress.total} ${PERIOD_LABELS[activePeriod].toLowerCase()} uppgifter klara`}
-      />
+      <div className="flex flex-col items-center py-2">
+        <ProgressRing
+          percent={progress.percent}
+          label={`${progress.done} av ${progress.total} ${PERIOD_LABELS[
+            activePeriod
+          ].toLowerCase()} uppgifter klara`}
+        />
+      </div>
 
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1">
+      <div className="flex gap-1 bg-charcoal-whisper border border-cream-border rounded-lg p-1">
         {PERIODS.map((period) => (
           <button
             key={period}
             onClick={() => setActivePeriod(period)}
-            className={`flex-1 text-center py-2 rounded-lg text-xs font-semibold transition-colors duration-200 min-h-[44px] ${
-              activePeriod === period ? 'bg-gold/15 text-gold' : 'text-slate-500'
+            className={`flex-1 text-center py-2 rounded-md text-[12px] font-medium transition-all duration-200 min-h-[40px] tracking-tight ${
+              activePeriod === period
+                ? 'bg-cream-light text-charcoal shadow-sm border border-cream-border'
+                : 'text-charcoal-muted'
             }`}
           >
             {PERIOD_LABELS[period]}
@@ -43,24 +51,34 @@ export default function Schedule() {
             <button
               key={task.id}
               onClick={() => toggleTask(activePeriod, task.id)}
-              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 transition-all duration-200 active:scale-[0.98] border ${
+              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 transition-all duration-200 active:opacity-80 border ${
                 done
-                  ? 'bg-status-ok/6 border-status-ok/15'
-                  : 'bg-glass-surface border-glass-border'
+                  ? 'bg-status-ok/5 border-status-ok/20'
+                  : 'bg-cream border-cream-border'
               }`}
             >
               <div
                 className={`w-[22px] h-[22px] rounded-md flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors duration-200 ${
-                  done ? 'bg-status-ok' : 'border-2 border-gold/30'
+                  done
+                    ? 'bg-status-ok border border-status-ok'
+                    : 'border-2 border-charcoal-line'
                 }`}
               >
-                {done && <Check size={14} className="text-navy" strokeWidth={3} />}
+                {done && <Check size={14} className="text-cream-light" strokeWidth={3} />}
               </div>
               <div>
-                <div className={`text-[13px] ${done ? 'text-slate-400 line-through' : 'text-slate-200'}`}>
+                <div
+                  className={`text-[14px] tracking-tight ${
+                    done
+                      ? 'text-charcoal-muted line-through'
+                      : 'text-charcoal font-medium'
+                  }`}
+                >
                   {task.name}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-0.5">{task.description}</div>
+                <div className="text-[11px] text-charcoal-muted mt-0.5">
+                  {task.description}
+                </div>
               </div>
             </button>
           )

@@ -1,36 +1,154 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 @import 'tailwindcss';
 
+/* Enable class-based dark mode: toggled by data-theme="dark" on <html> */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
-  --color-navy: #0a1628;
-  --color-navy-light: #111d33;
-  --color-gold: #E8C97A;
-  --color-gold-dark: #d4a855;
-  --color-status-ok: #4ade80;
-  --color-status-warn: #fbbf24;
+  /* Lovable-inspired LIGHT palette (defaults) */
+  --color-cream: #f7f4ed;
+  --color-cream-light: #fcfbf8;
+  --color-cream-border: #eceae4;
+
+  --color-charcoal: #1c1c1c;
+  --color-charcoal-muted: #5f5f5d;
+  --color-charcoal-strong: rgba(28, 28, 28, 0.83);
+  --color-charcoal-body: rgba(28, 28, 28, 0.82);
+  --color-charcoal-line: rgba(28, 28, 28, 0.4);
+  --color-charcoal-hover: rgba(28, 28, 28, 0.04);
+  --color-charcoal-whisper: rgba(28, 28, 28, 0.03);
+
+  /* Warm-neutral status tokens — readable on cream */
+  --color-status-ok: #3f7a4e;
+  --color-status-warn: #a86b05;
+  --color-status-error: #a83232;
+  --color-status-alert: #b55a1b;
+
+  /* Brand accent — charcoal in light, emerald in dark (Supabase-inspired) */
+  --color-accent: #1c1c1c;
+
+  /* Legacy aliases kept so existing utility classes keep working */
+  --color-navy: #f7f4ed;
+  --color-navy-light: #fcfbf8;
+  --color-gold: #1c1c1c;
+  --color-gold-dark: #0f0f0f;
+  --color-glass-surface: #f7f4ed;
+  --color-glass-border: #eceae4;
+
+  --font-family-display: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-family-body: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─────────────────────────────────────────────
+   DARK MODE — Supabase-inspired palette
+   Mapped semantically onto existing tokens so
+   every component adapts without class changes.
+   ───────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-cream: #171717;              /* page bg */
+  --color-cream-light: #0f0f0f;        /* inputs, buttons, recessed surfaces */
+  --color-cream-border: #2e2e2e;       /* standard 1px borders */
+
+  --color-charcoal: #fafafa;           /* primary text */
+  --color-charcoal-muted: #898989;     /* muted / secondary text */
+  --color-charcoal-strong: rgba(250, 250, 250, 0.92);
+  --color-charcoal-body: rgba(250, 250, 250, 0.82);
+  --color-charcoal-line: rgba(250, 250, 250, 0.22);
+  --color-charcoal-hover: rgba(250, 250, 250, 0.06);
+  --color-charcoal-whisper: rgba(250, 250, 250, 0.04);
+
+  /* Status — brighter/cleaner variants that read on dark surfaces.
+     status-ok doubles as the Supabase emerald brand accent. */
+  --color-status-ok: #3ecf8e;
+  --color-status-warn: #eab308;
   --color-status-error: #f87171;
   --color-status-alert: #fb923c;
-  --color-glass-surface: rgba(232,201,122,0.07);
-  --color-glass-border: rgba(232,201,122,0.12);
-  --font-family-display: 'Playfair Display', serif;
-  --font-family-body: 'DM Sans', sans-serif;
+
+  --color-accent: #3ecf8e;
+
+  /* Legacy aliases rebound to dark palette */
+  --color-navy: #171717;
+  --color-navy-light: #0f0f0f;
+  --color-gold: #fafafa;
+  --color-gold-dark: #efefef;
+  --color-glass-surface: #171717;
+  --color-glass-border: #2e2e2e;
+}
+
+html, body {
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 body {
-  @apply bg-navy text-slate-200 antialiased;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   overscroll-behavior: none;
+  letter-spacing: -0.01em;
 }
 
-/* Safe area support for notch/gesture bar devices */
-.safe-area-pb {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+/* Display headings tightened (Lovable-style editorial compression) */
+h1, h2, h3, .heading {
+  letter-spacing: -0.025em;
+  font-weight: 600;
 }
 
-.safe-area-pt {
-  padding-top: env(safe-area-inset-top, 0px);
+/* Signature inset shadow on primary buttons — adapts per theme */
+.shadow-inset-btn {
+  box-shadow:
+    rgba(255, 255, 255, 0.2) 0px 0.5px 0px 0px inset,
+    rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+[data-theme="dark"] .shadow-inset-btn {
+  box-shadow:
+    rgba(255, 255, 255, 0.08) 0px 0.5px 0px 0px inset,
+    rgba(255, 255, 255, 0.08) 0px 0px 0px 0.5px inset,
+    rgba(0, 0, 0, 0.4) 0px 1px 2px 0px;
+}
+
+.shadow-focus-warm {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+[data-theme="dark"] .shadow-focus-warm {
+  box-shadow:
+    0 0 0 1px rgba(62, 207, 142, 0.3),
+    rgba(0, 0, 0, 0.4) 0px 4px 12px;
+}
+
+/* Safe area helpers */
+.safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-area-pt { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Date picker follows theme */
+input[type="date"] {
+  color-scheme: light;
+}
+[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+
+/* Accessible focus ring — warm in light, green in dark */
+:where(button, a, input, textarea, select):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-cream-light),
+    0 0 0 4px var(--color-charcoal-line);
+}
+
+[data-theme="dark"] :where(button, a, input, textarea, select):focus-visible {
+  box-shadow:
+    0 0 0 2px var(--color-cream),
+    0 0 0 4px rgba(62, 207, 142, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

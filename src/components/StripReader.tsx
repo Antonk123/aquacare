@@ -58,14 +58,16 @@ export function StripReader({ onComplete, onCancel }: {
         <button
           type="button"
           onClick={handleBack}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2 rounded-full hover:bg-charcoal-hover transition-colors"
           aria-label="Tillbaka"
         >
-          <ChevronLeft size={20} className="text-slate-400" />
+          <ChevronLeft size={20} className="text-charcoal" strokeWidth={1.75} />
         </button>
         <div className="flex items-center gap-1.5">
-          <Pipette size={14} className="text-gold" />
-          <span className="text-xs text-gold font-semibold uppercase tracking-wider">Avläs teststicka</span>
+          <Pipette size={14} className="text-charcoal" strokeWidth={1.75} />
+          <span className="text-[11px] text-charcoal-muted font-medium uppercase tracking-[1.5px]">
+            Avläs teststicka
+          </span>
         </div>
         <div className="w-[44px]" />
       </div>
@@ -76,7 +78,11 @@ export function StripReader({ onComplete, onCancel }: {
           <div
             key={i}
             className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-              i === step ? 'bg-gold' : i < step ? 'bg-gold/40' : 'bg-white/15'
+              i === step
+                ? 'bg-charcoal'
+                : i < step
+                  ? 'bg-charcoal/50'
+                  : 'bg-charcoal/15'
             }`}
           />
         ))}
@@ -84,8 +90,8 @@ export function StripReader({ onComplete, onCancel }: {
 
       {/* Current step */}
       <div className="text-center mb-1">
-        <div className="text-sm text-slate-200 font-medium">{current.label}</div>
-        <div className="text-[11px] text-slate-400 mt-0.5">
+        <div className="text-base text-charcoal font-semibold tracking-tight">{current.label}</div>
+        <div className="text-[11px] text-charcoal-muted mt-0.5">
           Välj den färg som matchar din teststicka
         </div>
       </div>
@@ -97,7 +103,7 @@ export function StripReader({ onComplete, onCancel }: {
         const min = range.min !== undefined ? formatSwedishDecimal(range.min) : null
         const max = range.max !== undefined ? formatSwedishDecimal(range.max) : null
         return (
-          <div className="text-center text-[11px] text-status-ok mb-3">
+          <div className="text-center text-[11px] text-status-ok font-medium mb-3">
             Optimalt: {min && max ? `${min}–${max}` : max ? `< ${max}` : `> ${min}`}
             {current.unit ? ` ${current.unit}` : ''}
           </div>
@@ -118,14 +124,18 @@ export function StripReader({ onComplete, onCancel }: {
               <div
                 className={`w-[48px] h-[48px] rounded-xl border-2 transition-all duration-200 ${
                   selected[step] === item.value
-                    ? 'border-gold ring-2 ring-gold ring-offset-2 ring-offset-navy scale-110'
+                    ? 'border-charcoal ring-2 ring-charcoal/40 ring-offset-2 ring-offset-cream scale-110'
                     : optimal
-                      ? 'border-status-ok/50'
-                      : 'border-white/20'
+                      ? 'border-status-ok/60'
+                      : 'border-cream-border'
                 }`}
                 style={{ backgroundColor: item.color }}
               />
-              <span className={`text-[10px] font-medium ${optimal ? 'text-status-ok' : 'text-slate-400'}`}>
+              <span
+                className={`text-[10px] font-medium tabular-nums ${
+                  optimal ? 'text-status-ok' : 'text-charcoal-muted'
+                }`}
+              >
                 {formatSwedishDecimal(item.value)}
                 {current.unit ? ` ${current.unit}` : ''}
               </span>
@@ -135,7 +145,7 @@ export function StripReader({ onComplete, onCancel }: {
       </div>
 
       {/* Step count */}
-      <div className="text-center text-[11px] text-slate-500">
+      <div className="text-center text-[11px] text-charcoal-muted tabular-nums">
         Steg {step + 1} av 3
       </div>
     </GlassCard>

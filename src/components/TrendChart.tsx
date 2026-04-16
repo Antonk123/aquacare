@@ -27,7 +27,7 @@ function MiniChart({ entries, metric }: { entries: WaterLogEntry[]; metric: Metr
     .reverse()
 
   if (filtered.length < 2) {
-    return <p className="text-xs text-slate-500 text-center py-3">Logga fler test för att se trenden</p>
+    return <p className="text-xs text-charcoal-muted text-center py-3">Logga fler test för att se trenden</p>
   }
 
   const values = filtered.map((e) => e[metric.key] as number)
@@ -70,11 +70,11 @@ function MiniChart({ entries, metric }: { entries: WaterLogEntry[]; metric: Metr
 
       {showOpt && (
         <>
-          <rect x="0" y={optTop} width={w} height={optBottom - optTop} fill="rgba(74,222,128,0.04)" rx="2" />
-          <text x={w - 2} y={optTop - 1} fill="#475569" fontSize="5" textAnchor="end">
+          <rect x="0" y={optTop} width={w} height={optBottom - optTop} fill="var(--color-status-ok)" fillOpacity="0.1" rx="2" />
+          <text x={w - 2} y={optTop - 1} fill="var(--color-charcoal-muted)" fontSize="5" textAnchor="end">
             {formatSwedishDecimal(metric.optMax!)}
           </text>
-          <text x={w - 2} y={optBottom + 6} fill="#475569" fontSize="5" textAnchor="end">
+          <text x={w - 2} y={optBottom + 6} fill="var(--color-charcoal-muted)" fontSize="5" textAnchor="end">
             {formatSwedishDecimal(metric.optMin!)}
           </text>
         </>
@@ -86,15 +86,15 @@ function MiniChart({ entries, metric }: { entries: WaterLogEntry[]; metric: Metr
         points={polyline}
         fill="none"
         stroke={metric.color}
-        strokeWidth="2"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
-      <circle cx={last.x} cy={last.y} r="4" fill="#0a1628" stroke={metric.color} strokeWidth="2" />
+      <circle cx={last.x} cy={last.y} r="3.5" fill="var(--color-cream)" stroke={metric.color} strokeWidth="1.75" />
 
       {labels.map((label, i) => (
-        <text key={i} x={points[i].x} y={h + 10} fill="#475569" fontSize="5.5" textAnchor="middle">
+        <text key={i} x={points[i].x} y={h + 10} fill="var(--color-charcoal-muted)" fontSize="5.5" textAnchor="middle">
           {i === labels.length - 1 ? 'Nu' : label}
         </text>
       ))}
@@ -107,24 +107,24 @@ export function TrendChart({ entries }: { entries: WaterLogEntry[] }) {
   const active = METRICS[activeIdx]
 
   return (
-    <GlassCard className="!bg-gold/[0.03] !border-gold/10">
+    <GlassCard>
       <div className="flex justify-between items-center mb-2">
         <div className="flex gap-1">
           {METRICS.map((m, i) => (
             <button
               key={m.key}
               onClick={() => setActiveIdx(i)}
-              className={`text-[10px] font-semibold uppercase tracking-[1px] px-2 py-1 rounded-lg transition-colors duration-200 ${
+              className={`text-[10px] font-medium uppercase tracking-[1.5px] px-2 py-1 rounded-lg transition-colors duration-200 ${
                 i === activeIdx
-                  ? 'text-navy bg-gold/90'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'text-charcoal bg-charcoal/10'
+                  : 'text-charcoal-muted hover:text-charcoal'
               }`}
             >
               {m.label}
             </button>
           ))}
         </div>
-        <div className="text-[10px] text-slate-500">
+        <div className="text-[10px] text-charcoal-muted tabular-nums">
           {entries.filter((e) => e[active.key] !== undefined).slice(0, 7).length} test
         </div>
       </div>
