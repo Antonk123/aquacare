@@ -34,7 +34,11 @@ export default function Calculator() {
     const targetVal = Number(target.replace(',', '.'))
     const volumeVal = Number(volume.replace(',', '.'))
 
-    if (isNaN(currentVal) || isNaN(volumeVal)) return
+    if (action === 'shock') {
+      if (isNaN(volumeVal)) return
+    } else {
+      if (isNaN(currentVal) || isNaN(volumeVal)) return
+    }
 
     let diff: number
     if (action === 'shock') {

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 
 interface ConfirmDialogProps {
@@ -9,10 +10,20 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog({ title, message, confirmLabel = 'Ta bort', onConfirm, onCancel }: ConfirmDialogProps) {
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onCancel()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onCancel])
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
+        role="dialog"
+        aria-modal="true"
         className="relative bg-cream-light border border-cream-border rounded-2xl p-5 w-full max-w-[320px] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >

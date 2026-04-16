@@ -33,6 +33,7 @@ export default function Settings() {
   const [editingTubId, setEditingTubId] = useState<string | null>(null)
   const [deleteTubId, setDeleteTubId] = useState<string | null>(null)
   const [tubSaving, setTubSaving] = useState(false)
+  const [tubError, setTubError] = useState('')
 
   useEffect(() => {
     if (isAdmin) {
@@ -114,6 +115,7 @@ export default function Settings() {
     const name = tubForm.name.trim()
     const volume = Number(tubForm.volume)
     if (!name || isNaN(volume) || volume <= 0) return
+    setTubError('')
     setTubSaving(true)
 
     // Build customRanges for API
@@ -138,6 +140,8 @@ export default function Settings() {
         setTubs((prev) => [...prev, { id: created.id, name: created.name, volume: created.volume, sanitizer: created.sanitizer, custom_ranges: created.custom_ranges ?? null }])
       }
       cancelTubForm()
+    } catch {
+      setTubError('Kunde inte spara badet. Försök igen.')
     } finally {
       setTubSaving(false)
     }
@@ -165,7 +169,7 @@ export default function Settings() {
             <div className="text-sm font-semibold text-charcoal">{user?.name}</div>
             <div className="text-xs text-charcoal-muted">{facility?.name} — {user?.role === 'admin' ? 'Admin' : 'Personal'}</div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-1.5 min-h-[44px] px-3 text-red-400 text-sm font-medium">
+          <button onClick={handleLogout} className="flex items-center gap-1.5 min-h-[44px] px-3 text-status-error text-sm font-medium">
             <LogOut size={16} />
             Logga ut
           </button>
@@ -400,6 +404,7 @@ export default function Settings() {
                     <X size={16} className="text-charcoal-muted" />
                   </button>
                 </div>
+                {tubError && <p className="text-[12px] text-status-error mt-1">{tubError}</p>}
               </form>
             )}
           </GlassCard>

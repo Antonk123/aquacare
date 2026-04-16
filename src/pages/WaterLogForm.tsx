@@ -156,7 +156,7 @@ export default function WaterLogForm() {
               ...prev,
               freeChlorine: String(vals.freeChlorine).replace('.', ','),
               ph: String(vals.ph).replace('.', ','),
-              totalAlkalinity: String(vals.totalAlkalinity),
+              totalAlkalinity: String(vals.totalAlkalinity).replace('.', ','),
             }))
             setShowStrip(false)
             setStripDone(true)

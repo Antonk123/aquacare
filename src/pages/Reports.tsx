@@ -60,7 +60,7 @@ function mapApiLogToEntry(log: any): WaterLogEntry {
 function complianceColor(pct: number): string {
   if (pct >= 80) return 'text-emerald-400'
   if (pct >= 50) return 'text-amber-400'
-  return 'text-red-400'
+  return 'text-status-error'
 }
 
 function fmtVal(v: number | null | undefined): string {

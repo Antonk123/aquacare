@@ -35,10 +35,11 @@ export function StripReader({ onComplete, onCancel }: {
       setTimeout(() => setStep(step + 1), 300)
     } else {
       setTimeout(() => {
+        if (next[0] === null || next[1] === null || next[2] === null) return;
         onComplete({
-          freeChlorine: next[0]!,
-          ph: next[1]!,
-          totalAlkalinity: next[2]!,
+          freeChlorine: next[0],
+          ph: next[1],
+          totalAlkalinity: next[2],
         })
       }, 300)
     }

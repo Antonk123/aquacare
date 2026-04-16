@@ -47,10 +47,25 @@ export default function Dashboard() {
   const { state: scheduleState, toggleTask } = useSchedule()
   const { facility } = useAuth()
   const [tubs, setTubs] = useState<Tub[]>([])
-  const [selectedTubId, setSelectedTubId] = useState<string>('')
+  const [selectedTubId, setSelectedTubId] = useState<string>(() =>
+    localStorage.getItem('aquacare_selected_tub') ?? ''
+  )
+
+  function selectTub(id: string) {
+    setSelectedTubId(id)
+    if (id) localStorage.setItem('aquacare_selected_tub', id)
+    else localStorage.removeItem('aquacare_selected_tub')
+  }
 
   useEffect(() => {
-    api.listTubs().then(setTubs).catch(() => {})
+    api.listTubs().then((loaded) => {
+      setTubs(loaded)
+      // Auto-select if only 1 tub
+      if (loaded.length === 1) selectTub(loaded[0].id)
+      // Clear saved selection if tub no longer exists
+      const saved = localStorage.getItem('aquacare_selected_tub')
+      if (saved && !loaded.find((t) => t.id === saved)) selectTub('')
+    }).catch(() => {})
   }, [])
 
   const filtered = selectedTubId ? entries.filter((e) => e.tubId === selectedTubId) : entries
@@ -81,15 +96,15 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Tub filter pills */}
-      {tubs.length > 0 && (
+      {/* Tub filter pills — only when 2+ tubs */}
+      {tubs.length >= 2 && (
         <div
           className="flex gap-2 overflow-x-auto pb-0.5"
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as any}
         >
           <button
-            onClick={() => setSelectedTubId('')}
+            onClick={() => selectTub('')}
             className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
               selectedTubId === ''
                 ? 'bg-charcoal text-cream-light font-semibold'
@@ -101,7 +116,7 @@ export default function Dashboard() {
           {tubs.map((tub) => (
             <button
               key={tub.id}
-              onClick={() => setSelectedTubId(tub.id)}
+              onClick={() => selectTub(tub.id)}
               className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
                 selectedTubId === tub.id
                   ? 'bg-charcoal text-cream-light font-semibold'

@@ -67,6 +67,8 @@ export function useWaterLog() {
       })
       const mapped = mapFromApi(row)
       setEntries((prev) => prev.map((e) => (e.id === id ? mapped : e)))
+      // Refresh streak after edit
+      api.getStreak().then(setStreak).catch(() => {})
     },
     [],
   )

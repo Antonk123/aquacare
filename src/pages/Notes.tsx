@@ -169,7 +169,7 @@ export default function Notes() {
                   </div>
                 </div>
                 <button
-                  onClick={() => deleteNote(note.id)}
+                  onClick={() => setDeleteId(note.id)}
                   className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md hover:bg-charcoal-hover transition-colors"
                   aria-label="Ta bort"
                 >

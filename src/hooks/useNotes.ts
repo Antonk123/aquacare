@@ -31,13 +31,15 @@ export function useNotes() {
 
   const toggleNote = useCallback(
     async (id: string) => {
-      const current = notes.find((n) => n.id === id)
+      // Read current state via setter to avoid stale closure
+      let current: Note | undefined
+      setNotes((prev) => { current = prev.find((n) => n.id === id); return prev })
       if (!current) return
       const row = await api.updateNote(id, { completed: !current.completed })
       const mapped = mapFromApi(row)
       setNotes((prev) => prev.map((n) => (n.id === id ? mapped : n)))
     },
-    [notes],
+    [],
   )
 
   const deleteNote = useCallback(

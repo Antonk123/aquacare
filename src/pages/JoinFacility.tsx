@@ -67,7 +67,7 @@ export default function JoinFacility() {
               </div>
             </div>
           </GlassCard>
-          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+          {error && <p className="text-sm text-status-error text-center">{error}</p>}
           <button type="submit" disabled={loading} className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-charcoal text-cream-light shadow-inset-btn rounded-[14px] font-bold text-[15px] tracking-wide transition-transform duration-200 active:scale-[0.98] disabled:opacity-50">
             <KeyRound size={18} strokeWidth={2.5} />
             {loading ? 'Ansluter...' : 'Gå med'}

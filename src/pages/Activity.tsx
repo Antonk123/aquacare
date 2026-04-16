@@ -147,6 +147,13 @@ export default function Activity() {
   const [mayHaveMore, setMayHaveMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
 
+  // Re-render every 60s so relative timestamps stay fresh
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const timer = setInterval(() => setTick(t => t + 1), 60000)
+    return () => clearInterval(timer)
+  }, [])
+
   async function fetchActivities(newLimit: number, isLoadMore = false) {
     if (isLoadMore) setLoadingMore(true)
     else setLoading(true)
@@ -204,7 +211,7 @@ export default function Activity() {
       {/* Error state */}
       {!loading && error && (
         <GlassCard>
-          <p className="text-sm text-red-400 text-center py-4">{error}</p>
+          <p className="text-sm text-status-error text-center py-4">{error}</p>
         </GlassCard>
       )}
 
