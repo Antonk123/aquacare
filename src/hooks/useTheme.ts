@@ -1,92 +1,77 @@
 import { useEffect, useState, useCallback } from 'react'
 
+export type Mood = 'hammam' | 'terme' | 'onsen'
+
+// Legacy exports for compatibility
 export type Theme = 'light' | 'dark'
-export type Palette = 'classic' | 'ocean' | 'teal' | 'midnight' | 'emerald'
+export type Palette = Mood
 
-const THEME_KEY = 'aquacare_theme'
-const PALETTE_KEY = 'aquacare_palette'
+const MOOD_KEY = 'aquacare_mood'
 
-function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light'
+const VALID_MOODS: Mood[] = ['hammam', 'terme', 'onsen']
+
+export const MOOD_META: Record<Mood, { name: string; subtitle: string; metaColor: string }> = {
+  hammam: { name: 'Hammam', subtitle: 'Mineral, imma, eucalyptus', metaColor: '#e8ecf0' },
+  terme: { name: 'Terme', subtitle: 'Sand, terrakotta, djupvatten', metaColor: '#ede5d4' },
+  onsen: { name: 'Onsen', subtitle: 'Teak, djupvatten, guld', metaColor: '#1a1610' },
+}
+
+function getInitialMood(): Mood {
+  if (typeof window === 'undefined') return 'hammam'
   try {
-    const stored = localStorage.getItem(THEME_KEY)
-    if (stored === 'light' || stored === 'dark') return stored
+    const stored = localStorage.getItem(MOOD_KEY)
+    if (stored && VALID_MOODS.includes(stored as Mood)) return stored as Mood
   } catch {
     // ignore
   }
-  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-    return 'dark'
-  }
-  return 'light'
+  return 'hammam'
 }
 
-const VALID_PALETTES: Palette[] = ['classic', 'ocean', 'teal', 'midnight', 'emerald']
-
-function getInitialPalette(): Palette {
-  if (typeof window === 'undefined') return 'classic'
-  try {
-    const stored = localStorage.getItem(PALETTE_KEY)
-    if (stored && VALID_PALETTES.includes(stored as Palette)) return stored as Palette
-  } catch {
-    // ignore
-  }
-  return 'classic'
-}
-
-/** Theme-color meta values per palette×mode */
-const META_COLORS: Record<Palette, { light: string; dark: string }> = {
-  classic:  { light: '#f7f4ed', dark: '#171717' },
-  ocean:    { light: '#f8fafc', dark: '#0c1222' },
-  teal:     { light: '#f0fdfa', dark: '#0a1a1a' },
-  midnight: { light: '#0f0f0f', dark: '#0f0f0f' },
-  emerald:  { light: '#f0fdf4', dark: '#0a1a10' },
-}
-
-function applyTheme(theme: Theme, palette: Palette) {
+function applyMood(mood: Mood) {
   const root = document.documentElement
-  // Midnight is always dark
-  const effectiveTheme = palette === 'midnight' ? 'dark' : theme
-  root.setAttribute('data-theme', effectiveTheme)
-  root.setAttribute('data-palette', palette)
+  root.setAttribute('data-mood', mood)
 
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
   if (meta) {
-    meta.content = META_COLORS[palette][effectiveTheme]
+    meta.content = MOOD_META[mood].metaColor
   }
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme)
-  const [palette, setPaletteState] = useState<Palette>(getInitialPalette)
+  const [mood, setMoodState] = useState<Mood>(getInitialMood)
 
   useEffect(() => {
-    applyTheme(theme, palette)
-  }, [theme, palette])
+    applyMood(mood)
+  }, [mood])
 
-  const setTheme = useCallback((next: Theme) => {
-    setThemeState(next)
-    try { localStorage.setItem(THEME_KEY, next) } catch { /* ignore */ }
+  const setMood = useCallback((next: Mood) => {
+    setMoodState(next)
+    try { localStorage.setItem(MOOD_KEY, next) } catch { /* ignore */ }
   }, [])
 
+  // Derived theme for components that check light/dark
+  const theme: Theme = mood === 'onsen' ? 'dark' : 'light'
+  const isDark = mood === 'onsen'
+
+  // Legacy compatibility
+  const palette = mood
+  const setPalette = setMood as (p: Palette) => void
+  const setTheme = useCallback(() => {}, [])
   const toggleTheme = useCallback(() => {
-    setThemeState((prev) => {
-      const next: Theme = prev === 'dark' ? 'light' : 'dark'
-      try { localStorage.setItem(THEME_KEY, next) } catch { /* ignore */ }
+    // Cycle through moods instead
+    setMoodState(prev => {
+      const idx = VALID_MOODS.indexOf(prev)
+      const next = VALID_MOODS[(idx + 1) % VALID_MOODS.length]
+      try { localStorage.setItem(MOOD_KEY, next) } catch { /* ignore */ }
       return next
     })
   }, [])
 
-  const setPalette = useCallback((next: Palette) => {
-    setPaletteState(next)
-    try { localStorage.setItem(PALETTE_KEY, next) } catch { /* ignore */ }
-  }, [])
-
-  return { theme, setTheme, toggleTheme, palette, setPalette }
+  return { theme, setTheme, toggleTheme, palette, setPalette, mood, setMood, isDark }
 }
 
 export function initThemeBeforeMount() {
   if (typeof window === 'undefined') return
-  const theme = getInitialTheme()
-  const palette = getInitialPalette()
-  applyTheme(theme, palette)
+  const mood = getInitialMood()
+  applyMood(mood)
 }

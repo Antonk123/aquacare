@@ -1,13 +1,6 @@
 import { useState } from 'react'
-import { Plus, Clock, Check, X } from 'lucide-react'
-import { GlassCard } from '../components/GlassCard'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useNotes } from '../hooks/useNotes'
-
-const INPUT_CLS =
-  'w-full bg-cream-light border border-cream-border rounded-md px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:shadow-focus-warm transition-shadow duration-200'
-
-const LABEL_CLS = 'block text-[12px] text-charcoal-muted mb-1.5 font-medium tracking-tight'
 
 function formatDueDate(iso: string, completed: boolean, completedDate?: string): string {
   if (completed && completedDate) {
@@ -44,140 +37,124 @@ export default function Notes() {
   const completed = notes.filter((n) => n.completed)
 
   return (
-    <div className="p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-[28px] leading-none font-semibold text-charcoal tracking-[-0.035em]">
-          Noteringar
-        </h1>
+    <div className="px-4 pb-4 space-y-4">
+      {/* Header */}
+      <div className="px-1 pt-2 pb-2 flex items-start justify-between">
+        <div>
+          <div className="spa-label">Anteckningar</div>
+          <h1 className="spa-heading text-[32px] mt-1.5 text-charcoal">
+            Anteckningar<span className="text-accent">.</span>
+          </h1>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 bg-charcoal text-cream-light rounded-md px-4 font-medium text-[13px] min-h-[40px] tracking-tight shadow-inset-btn active:opacity-80 transition-opacity"
+          className="mt-4 flex items-center gap-1.5 bg-charcoal text-cream rounded-full px-4 py-2 font-body text-[13px] shadow-inset-btn active:opacity-80 transition-opacity"
+          style={{ fontWeight: 500, letterSpacing: '-0.01em' }}
         >
-          <Plus size={16} strokeWidth={2} />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
           Lägg till
         </button>
       </div>
 
+      {/* Add form */}
       {showForm && (
-        <GlassCard>
+        <div className="spa-card !p-4 space-y-3">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className={LABEL_CLS}>Titel</label>
+              <div className="spa-label !text-[10px] mb-1.5">Titel</div>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="T.ex. Byt filterpatron"
-                className={INPUT_CLS}
+                className="w-full bg-cream border border-cream-border rounded-xl px-3.5 min-h-[48px] text-base text-charcoal placeholder:text-charcoal-muted focus:outline-none font-body"
                 autoFocus
               />
             </div>
             <div>
-              <label className={LABEL_CLS}>Förfallodatum</label>
+              <div className="spa-label !text-[10px] mb-1.5">Förfallodatum</div>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className={INPUT_CLS}
+                className="w-full bg-cream border border-cream-border rounded-xl px-3.5 min-h-[48px] text-base text-charcoal focus:outline-none font-body"
               />
             </div>
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 w-full min-h-[48px] bg-charcoal text-cream-light rounded-md font-medium text-[15px] tracking-tight shadow-inset-btn transition-opacity duration-200 active:opacity-80"
+              className="w-full py-3.5 bg-charcoal text-cream rounded-full font-body text-[15px] shadow-inset-btn active:opacity-80 transition-opacity"
+              style={{ fontWeight: 500 }}
             >
               Spara
             </button>
           </form>
-        </GlassCard>
+        </div>
       )}
 
       {pending.length === 0 && completed.length === 0 && !showForm && (
-        <GlassCard className="text-center py-8">
-          <p className="text-sm text-charcoal-muted">Inga noteringar ännu</p>
-        </GlassCard>
+        <div className="spa-card p-8 text-center">
+          <p className="text-charcoal-muted font-body text-[14px]">Inga noteringar ännu</p>
+        </div>
       )}
 
-      {pending.length > 0 && (
-        <>
-          <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-1">
-            Kommande
+      {/* Pending notes */}
+      {pending.map((note) => {
+        const overdue = isOverdue(note.dueDate)
+        return (
+          <div key={note.id} className="spa-card !p-5 relative">
+            <div className="spa-mono text-charcoal-whisper mb-1.5" style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {note.dueDate}
+            </div>
+            <div className="font-display text-[20px] text-charcoal leading-snug" style={{ fontWeight: 400, letterSpacing: '-0.02em' }}>
+              {note.title}
+            </div>
+            <div className={`font-body text-[12px] mt-2 ${overdue ? 'text-status-error font-medium' : 'text-charcoal-muted'}`}>
+              {formatDueDate(note.dueDate, false)}
+            </div>
+            <button
+              onClick={() => toggleNote(note.id)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full border border-cream-border flex items-center justify-center hover:bg-charcoal-hover transition-colors"
+              aria-label="Markera klar"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+            </button>
           </div>
-          <div className="space-y-2">
-            {pending.map((note) => {
-              const overdue = isOverdue(note.dueDate)
-              return (
-                <GlassCard key={note.id} className="flex items-start gap-3">
-                  <div
-                    className={`min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md flex-shrink-0 ${
-                      overdue
-                        ? 'bg-status-alert/10 border border-status-alert/20'
-                        : 'bg-charcoal-whisper border border-cream-border'
-                    }`}
-                  >
-                    <Clock
-                      size={18}
-                      className={overdue ? 'text-status-alert' : 'text-charcoal'}
-                      strokeWidth={1.75}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 pt-1">
-                    <div className="text-[14px] text-charcoal font-medium tracking-tight">
-                      {note.title}
-                    </div>
-                    <div
-                      className={`text-[11px] mt-1 ${
-                        overdue ? 'text-status-alert font-medium' : 'text-charcoal-muted'
-                      }`}
-                    >
-                      {formatDueDate(note.dueDate, false)}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => toggleNote(note.id)}
-                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md hover:bg-charcoal-hover transition-colors"
-                    aria-label="Markera klar"
-                  >
-                    <Check size={18} className="text-charcoal-muted" strokeWidth={1.75} />
-                  </button>
-                </GlassCard>
-              )
-            })}
-          </div>
-        </>
-      )}
+        )
+      })}
 
+      {/* Completed notes */}
       {completed.length > 0 && (
         <>
-          <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-2">
-            Klara
+          <div className="flex items-center gap-2.5 px-0.5 mt-2">
+            <div className="font-display text-[15px] italic text-charcoal-muted" style={{ fontWeight: 300 }}>klara</div>
+            <div className="flex-1 h-px bg-cream-border" />
           </div>
-          <div className="space-y-2">
-            {completed.map((note) => (
-              <div
-                key={note.id}
-                className="bg-cream border border-cream-border rounded-xl p-4 flex items-start gap-3"
-              >
-                <div className="min-w-[40px] min-h-[40px] flex items-center justify-center bg-status-ok/10 border border-status-ok/20 rounded-md flex-shrink-0">
-                  <Check size={18} className="text-status-ok" strokeWidth={2.25} />
-                </div>
-                <div className="flex-1 min-w-0 pt-1">
-                  <div className="text-[14px] text-charcoal-muted line-through tracking-tight">
-                    {note.title}
-                  </div>
-                  <div className="text-[11px] text-charcoal-muted/70 mt-1">
-                    {formatDueDate(note.dueDate, true, note.completedDate)}
-                  </div>
-                </div>
-                <button
-                  onClick={() => setDeleteId(note.id)}
-                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md hover:bg-charcoal-hover transition-colors"
-                  aria-label="Ta bort"
-                >
-                  <X size={18} className="text-charcoal-muted" strokeWidth={1.75} />
-                </button>
+          {completed.map((note) => (
+            <div key={note.id} className="spa-card !p-5 relative opacity-60">
+              <div className="spa-mono text-charcoal-whisper mb-1.5" style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {note.dueDate}
               </div>
-            ))}
-          </div>
+              <div className="font-display text-[20px] text-charcoal-muted line-through leading-snug" style={{ fontWeight: 400, letterSpacing: '-0.02em' }}>
+                {note.title}
+              </div>
+              <div className="font-body text-[12px] text-charcoal-muted mt-2">
+                {formatDueDate(note.dueDate, true, note.completedDate)}
+              </div>
+              <button
+                onClick={() => setDeleteId(note.id)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full border border-cream-border flex items-center justify-center hover:bg-charcoal-hover transition-colors"
+                aria-label="Ta bort"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          ))}
         </>
       )}
 

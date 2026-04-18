@@ -1,82 +1,113 @@
 import { useState } from 'react'
-import { Check } from 'lucide-react'
-import { ProgressRing } from '../components/ProgressRing'
 import { useSchedule } from '../hooks/useSchedule'
-import { SCHEDULE_TASKS, PERIOD_LABELS } from '../constants'
+import { SCHEDULE_TASKS } from '../constants'
 import type { SchedulePeriod } from '../types'
 
-const PERIODS: SchedulePeriod[] = ['daily', 'weekly', 'monthly', 'quarterly']
+const PERIODS: { id: SchedulePeriod; label: string }[] = [
+  { id: 'daily', label: 'Dagligen' },
+  { id: 'weekly', label: 'Veckovis' },
+]
 
 export default function Schedule() {
   const [activePeriod, setActivePeriod] = useState<SchedulePeriod>('daily')
   const { state, toggleTask, getProgress } = useSchedule()
   const progress = getProgress(activePeriod)
   const tasks = SCHEDULE_TASKS[activePeriod]
+  const percent = progress.total ? progress.done / progress.total : 0
 
   return (
-    <div className="p-5 space-y-5">
-      <h1 className="font-display text-[28px] leading-none font-semibold text-charcoal tracking-[-0.035em]">
-        Underhåll
-      </h1>
-
-      <div className="flex flex-col items-center py-2">
-        <ProgressRing
-          percent={progress.percent}
-          label={`${progress.done} av ${progress.total} ${PERIOD_LABELS[
-            activePeriod
-          ].toLowerCase()} uppgifter klara`}
-        />
+    <div className="px-4 pb-4 space-y-4">
+      {/* Header */}
+      <div className="px-1 pt-2 pb-2">
+        <div className="spa-label">Underhåll</div>
+        <h1 className="spa-heading text-[32px] mt-1.5 text-charcoal">
+          Omsorg i rytm<span className="text-accent">.</span>
+        </h1>
       </div>
 
-      <div className="flex gap-1 bg-charcoal-whisper border border-cream-border rounded-lg p-1">
-        {PERIODS.map((period) => (
+      {/* Progress ring */}
+      <div className="flex justify-center mb-2">
+        <div className="relative" style={{ width: 140, height: 140 }}>
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--color-cream-border)" strokeWidth="6" />
+            <circle
+              cx="70" cy="70" r="60"
+              fill="none"
+              stroke="var(--color-accent)"
+              strokeWidth="6"
+              strokeDasharray={`${2 * Math.PI * 60 * percent} ${2 * Math.PI * 60}`}
+              strokeLinecap="round"
+              transform="rotate(-90 70 70)"
+              style={{ transition: 'stroke-dasharray 0.5s' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="spa-value text-[38px] leading-none" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+              {progress.done}
+              <span className="text-charcoal-whisper text-[20px]">/{progress.total}</span>
+            </div>
+            <div className="spa-label !text-[10px] mt-0.5">avklarade</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Period tabs */}
+      <div className="flex gap-1 p-1 spa-card !rounded-full">
+        {PERIODS.map((p) => (
           <button
-            key={period}
-            onClick={() => setActivePeriod(period)}
-            className={`flex-1 text-center py-2 rounded-md text-[12px] font-medium transition-all duration-200 min-h-[40px] tracking-tight ${
-              activePeriod === period
-                ? 'bg-cream-light text-charcoal shadow-sm border border-cream-border'
-                : 'text-charcoal-muted'
-            }`}
+            key={p.id}
+            onClick={() => setActivePeriod(p.id)}
+            className="flex-1 py-2 rounded-full font-body text-[13px] transition-all duration-200"
+            style={{
+              background: activePeriod === p.id ? 'var(--color-charcoal)' : 'transparent',
+              color: activePeriod === p.id ? 'var(--color-cream)' : 'var(--color-charcoal-muted)',
+              fontWeight: activePeriod === p.id ? 500 : 400,
+              letterSpacing: '-0.01em',
+            }}
           >
-            {PERIOD_LABELS[period]}
+            {p.label}
           </button>
         ))}
       </div>
 
-      <div className="space-y-2">
-        {tasks.map((task) => {
+      {/* Tasks */}
+      <div className="spa-card overflow-hidden !p-0">
+        {tasks.map((task, i) => {
           const done = state[activePeriod][task.id] ?? false
           return (
             <button
               key={task.id}
               onClick={() => toggleTask(activePeriod, task.id)}
-              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 transition-all duration-200 active:opacity-80 border ${
-                done
-                  ? 'bg-status-ok/5 border-status-ok/20'
-                  : 'bg-cream border-cream-border'
-              }`}
+              className="w-full flex items-center gap-3 px-3.5 py-3 text-left transition-opacity active:opacity-80"
+              style={{
+                borderBottom: i < tasks.length - 1 ? '0.5px solid var(--color-cream-border)' : 'none',
+              }}
             >
               <div
-                className={`w-[22px] h-[22px] rounded-md flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors duration-200 ${
-                  done
-                    ? 'bg-status-ok border border-status-ok'
-                    : 'border-2 border-charcoal-line'
-                }`}
+                className="w-[22px] h-[22px] rounded-full flex-shrink-0 flex items-center justify-center transition-all duration-200"
+                style={{
+                  border: `1.5px solid ${done ? 'var(--color-status-ok)' : 'var(--color-charcoal-line)'}`,
+                  background: done ? 'var(--color-status-ok)' : 'transparent',
+                }}
               >
-                {done && <Check size={14} className="text-cream-light" strokeWidth={3} />}
+                {done && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12l5 5L20 7" />
+                  </svg>
+                )}
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <div
-                  className={`text-[14px] tracking-tight ${
-                    done
-                      ? 'text-charcoal-muted line-through'
-                      : 'text-charcoal font-medium'
-                  }`}
+                  className="font-display text-[16px] leading-tight"
+                  style={{
+                    color: done ? 'var(--color-charcoal-whisper)' : 'var(--color-charcoal)',
+                    textDecoration: done ? 'line-through' : 'none',
+                    letterSpacing: '-0.01em',
+                  }}
                 >
                   {task.name}
                 </div>
-                <div className="text-[11px] text-charcoal-muted mt-0.5">
+                <div className="font-body text-[11px] text-charcoal-muted mt-0.5" style={{ letterSpacing: '-0.01em' }}>
                   {task.description}
                 </div>
               </div>

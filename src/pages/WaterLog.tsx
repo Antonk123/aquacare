@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Info, Check, AlertTriangle, Trash2, Pencil } from 'lucide-react'
-import { GlassCard } from '../components/GlassCard'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal } from '../constants'
@@ -13,43 +11,30 @@ interface Tub {
   name: string
 }
 
-function formatDate(iso: string): string {
-  const date = new Date(iso)
-  const now = new Date()
-  const today = now.toISOString().split('T')[0]
-  const yesterday = new Date(now.getTime() - 86400000).toISOString().split('T')[0]
-  const dateStr = iso.split('T')[0]
-  const time = date.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
-
-  if (dateStr === today) return `Idag, ${time}`
-  if (dateStr === yesterday) return `Igår, ${time}`
-  return `${date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })}, ${time}`
+function fmt(v: number | undefined, decimals = 1): string {
+  if (v == null) return '—'
+  return v.toFixed(decimals).replace('.', ',')
 }
 
 export default function WaterLog() {
   const { entries, deleteEntry } = useWaterLog()
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [tubs, setTubs] = useState<Tub[]>([])
-  const [selectedTubId, setSelectedTubId] = useState<string>(() =>
-    localStorage.getItem('aquacare_selected_tub') ?? ''
-  )
-
-  function selectTub(id: string) {
-    setSelectedTubId(id)
-    if (id) localStorage.setItem('aquacare_selected_tub', id)
-    else localStorage.removeItem('aquacare_selected_tub')
-  }
+  const [filter, setFilter] = useState<string>('all')
 
   useEffect(() => {
-    api.listTubs().then((loaded) => {
-      setTubs(loaded)
-      if (loaded.length === 1) selectTub(loaded[0].id)
-      const saved = localStorage.getItem('aquacare_selected_tub')
-      if (saved && !loaded.find((t) => t.id === saved)) selectTub('')
-    }).catch(() => {})
+    api.listTubs().then(setTubs).catch(() => {})
   }, [])
 
-  const filtered = selectedTubId ? entries.filter((e) => e.tubId === selectedTubId) : entries
+  const filtered = filter === 'all' ? entries : entries.filter((e) => e.tubId === filter)
+
+  // Group by month
+  const byMonth: Record<string, typeof entries> = {}
+  filtered.forEach((r) => {
+    const d = new Date(r.date)
+    const key = d.toLocaleDateString('sv-SE', { year: 'numeric', month: 'long' })
+    ;(byMonth[key] = byMonth[key] || []).push(r)
+  })
 
   function getEntryStatus(entry: typeof entries[0]): { status: ValueStatus; warnings: number } {
     let warnings = 0
@@ -65,143 +50,127 @@ export default function WaterLog() {
   }
 
   return (
-    <div className="p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-[28px] leading-none font-semibold text-charcoal tracking-[-0.035em]">
-          Vattenlogg
+    <div className="px-4 pb-4 space-y-4">
+      {/* Header */}
+      <div className="px-1 pt-2 pb-2">
+        <div className="spa-label">Vattenlogg</div>
+        <h1 className="spa-heading text-[32px] mt-1.5 text-charcoal">
+          Tunnans minne<span className="text-accent">.</span>
         </h1>
-        <Link
-          to="/logg/ny"
-          className="flex items-center gap-1.5 bg-charcoal text-cream-light rounded-md px-4 font-medium text-[13px] min-h-[40px] tracking-tight shadow-inset-btn active:opacity-80 transition-opacity"
-        >
-          <Plus size={16} strokeWidth={2} />
-          Ny loggning
-        </Link>
+        <div className="font-body text-[13px] text-charcoal-muted mt-1.5" style={{ letterSpacing: '-0.01em' }}>
+          {filtered.length} noteringar · senaste 7 dagar
+        </div>
       </div>
 
-      {/* Tub filter pills — only when 2+ tubs */}
-      {tubs.length >= 2 && (
-        <div
-          className="flex gap-2 overflow-x-auto pb-0.5"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as any}
-        >
+      {/* Filter tabs */}
+      <div className="flex gap-1.5">
+        {[{ id: 'all', label: 'Alla' }, ...tubs.map((t) => ({ id: t.id, label: t.name }))].map((t) => (
           <button
-            onClick={() => selectTub('')}
-            className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
-              selectedTubId === ''
-                ? 'bg-charcoal text-cream-light font-semibold'
-                : 'bg-charcoal-whisper text-charcoal-muted'
-            }`}
+            key={t.id}
+            onClick={() => setFilter(t.id)}
+            className={filter === t.id ? 'spa-pill spa-pill-active' : 'spa-pill spa-pill-inactive'}
           >
-            Alla
+            {t.label}
           </button>
-          {tubs.map((tub) => (
-            <button
-              key={tub.id}
-              onClick={() => selectTub(tub.id)}
-              className={`px-3 py-1.5 rounded-lg text-[12px] whitespace-nowrap transition-colors duration-150 ${
-                selectedTubId === tub.id
-                  ? 'bg-charcoal text-cream-light font-semibold'
-                  : 'bg-charcoal-whisper text-charcoal-muted'
-              }`}
-            >
-              {tub.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="flex items-center gap-3 px-1 text-[11px] text-charcoal-muted">
-        <Info size={12} className="flex-shrink-0" strokeWidth={1.75} />
-        {OPTIMAL_RANGES.map((r, i) => (
-          <span key={r.key} className="tabular-nums whitespace-nowrap">
-            {r.label}{' '}
-            <span className="text-charcoal font-medium">
-              {r.min !== undefined ? formatSwedishDecimal(r.min) : ''}
-              {r.min !== undefined && r.max !== undefined ? '–' : ''}
-              {r.max !== undefined
-                ? `${r.min === undefined ? '<' : ''}${formatSwedishDecimal(r.max)}`
-                : ''}
-            </span>
-            {i < OPTIMAL_RANGES.length - 1 && <span className="ml-3 text-charcoal-line">·</span>}
-          </span>
         ))}
       </div>
 
-      <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-1">
-        Senaste loggningar
-      </div>
-
-      {filtered.length === 0 ? (
-        <GlassCard className="text-center py-8">
-          <p className="text-sm text-charcoal-muted">Inga loggningar ännu</p>
-        </GlassCard>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((entry) => {
-            const { status, warnings } = getEntryStatus(entry)
-            return (
-              <GlassCard key={entry.id}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] text-charcoal font-medium tracking-tight">{formatDate(entry.date)}</span>
-                    {entry.tubName && (
-                      <span className="text-[10px] bg-charcoal/5 text-charcoal-muted px-2 py-0.5 rounded-md font-medium">{entry.tubName}</span>
-                    )}
-                  </div>
-                  {status === 'ok' ? (
-                    <span className="inline-flex items-center gap-1 bg-status-ok/10 text-status-ok text-[10px] px-2 py-0.5 rounded-md font-medium">
-                      <Check size={10} strokeWidth={2.5} />
-                      OK
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 bg-status-alert/10 text-status-alert text-[10px] px-2 py-0.5 rounded-md font-medium">
-                      <AlertTriangle size={10} strokeWidth={2.5} />
-                      {warnings} varning{warnings > 1 ? 'ar' : ''}
-                    </span>
-                  )}
-                </div>
-                {entry.note && (
-                  <p className="text-xs text-charcoal-muted italic mb-3">{entry.note}</p>
-                )}
-                <div className="grid grid-cols-4 gap-2 mb-3">
-                  {OPTIMAL_RANGES.map((range) => {
-                    const val = entry[range.key] as number | undefined
-                    if (val === undefined) return null
-                    const s = getValueStatus(range, val)
-                    const color = s === 'ok' ? 'text-charcoal' : s === 'warn' ? 'text-status-warn' : 'text-status-error'
-                    return (
-                      <div key={range.key} className="text-center">
-                        <div className={`text-[18px] font-semibold tabular-nums tracking-tight leading-tight ${color}`}>
-                          {formatSwedishDecimal(val)}
-                        </div>
-                        <div className="text-[10px] text-charcoal-muted mt-0.5">{range.label}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-                <div className="flex items-center justify-end gap-1 border-t border-cream-border pt-2 -mb-1">
-                  <Link
-                    to={`/logg/redigera/${entry.id}`}
-                    className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
-                    aria-label="Redigera loggning"
-                  >
-                    <Pencil size={14} className="text-charcoal-muted" strokeWidth={1.75} />
-                  </Link>
-                  <button
-                    onClick={() => setDeleteId(entry.id)}
-                    className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
-                    aria-label="Ta bort loggning"
-                  >
-                    <Trash2 size={14} className="text-charcoal-muted" strokeWidth={1.75} />
-                  </button>
-                </div>
-              </GlassCard>
-            )
-          })}
+      {/* Entries grouped by month */}
+      {Object.keys(byMonth).length === 0 ? (
+        <div className="spa-card p-8 text-center">
+          <p className="text-charcoal-muted font-body text-[14px]">Inga loggningar ännu</p>
         </div>
+      ) : (
+        Object.entries(byMonth).map(([month, monthEntries]) => (
+          <div key={month} className="space-y-2">
+            <div className="flex items-baseline gap-2.5 px-0.5">
+              <div className="font-display text-[15px] italic text-charcoal-muted" style={{ fontWeight: 300, letterSpacing: '-0.01em' }}>
+                {month}
+              </div>
+              <div className="flex-1 h-px bg-cream-border" />
+            </div>
+            <div className="spa-card overflow-hidden !p-0">
+              {monthEntries.map((entry, i) => {
+                const d = new Date(entry.date)
+                const day = d.getDate()
+                const time = d.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
+                const { status, warnings } = getEntryStatus(entry)
+
+                return (
+                  <Link
+                    key={entry.id}
+                    to={`/logg/redigera/${entry.id}`}
+                    className="w-full flex gap-3.5 items-start text-left px-4 py-3.5"
+                    style={{
+                      borderBottom: i < monthEntries.length - 1 ? '0.5px solid var(--color-cream-border)' : 'none',
+                    }}
+                  >
+                    {/* Large date */}
+                    <div className="spa-value text-[32px] leading-none text-charcoal min-w-[36px]" style={{ fontWeight: 300, letterSpacing: '-0.04em' }}>
+                      {day}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-body text-[11px] text-charcoal-muted" style={{ letterSpacing: '0.05em' }}>{time}</span>
+                        {entry.tubName && (
+                          <span className="font-body text-[10px] px-1.5 py-0.5 rounded bg-accent-soft text-charcoal" style={{ letterSpacing: '0.03em' }}>
+                            {entry.tubName}
+                          </span>
+                        )}
+                        {status === 'ok' ? (
+                          <span className="w-[5px] h-[5px] rounded-full bg-status-ok" />
+                        ) : (
+                          <span className="font-body text-[10px]" style={{ color: status === 'error' ? 'var(--color-status-error)' : 'var(--color-status-warn)', letterSpacing: '0.03em' }}>
+                            {warnings} varning{warnings > 1 ? 'ar' : ''}
+                          </span>
+                        )}
+                      </div>
+                      {/* Values row */}
+                      <div className="flex gap-3.5 mt-1.5 spa-mono text-[12px] text-charcoal-muted" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                        {OPTIMAL_RANGES.map((range) => {
+                          const val = entry[range.key] as number | undefined
+                          if (val === undefined) return null
+                          const s = getValueStatus(range, val)
+                          return (
+                            <div key={range.key}>
+                              <span className="opacity-55 text-[9px]" style={{ letterSpacing: '0.05em' }}>
+                                {range.label.slice(0, 2).toUpperCase()}
+                              </span>
+                              <span
+                                className="ml-1"
+                                style={{ color: s === 'ok' ? 'var(--color-charcoal)' : s === 'warn' ? 'var(--color-status-warn)' : 'var(--color-status-error)' }}
+                              >
+                                {fmt(val, range.key === 'totalAlkalinity' ? 0 : 1)}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      {/* Note */}
+                      {entry.note && (
+                        <div className="mt-2 font-display text-[13px] italic text-charcoal-muted leading-snug" style={{ fontWeight: 300, letterSpacing: '-0.005em' }}>
+                          &ldquo;{entry.note}&rdquo;
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))
       )}
+
+      {/* FAB */}
+      <Link
+        to="/logg/ny"
+        className="fixed bottom-28 right-5 z-20 w-14 h-14 rounded-full bg-charcoal text-cream flex items-center justify-center shadow-lg active:opacity-80 transition-opacity"
+        style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.18), inset 0 0.5px 0 rgba(255,255,255,0.15)' }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </Link>
 
       {deleteId && (
         <ConfirmDialog

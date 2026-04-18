@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f7f4ed" />
+    <meta name="theme-color" content="#e8ecf0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="manifest" href="/manifest.json" />
@@ -12,22 +12,15 @@
     <meta name="apple-mobile-web-app-title" content="AquaCare" />
     <title>AquaCare</title>
     <script>
-      // Apply saved theme before first paint to prevent flash of wrong theme
+      // Apply saved mood before first paint to prevent flash
       (function () {
         try {
-          var saved = localStorage.getItem('aquacare_theme');
-          var theme =
-            saved === 'light' || saved === 'dark'
-              ? saved
-              : window.matchMedia &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
-          document.documentElement.setAttribute('data-theme', theme);
+          var mood = localStorage.getItem('aquacare_mood') || 'hammam';
+          document.documentElement.setAttribute('data-mood', mood);
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.content = theme === 'dark' ? '#171717' : '#f7f4ed';
+          if (meta) meta.content = mood === 'onsen' ? '#1a1610' : mood === 'terme' ? '#ede5d4' : '#e8ecf0';
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.setAttribute('data-mood', 'hammam');
         }
       })();
     </script>

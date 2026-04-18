@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react'
 
 /**
- * Lovable-style surface card: warm cream background, 1px border (#eceae4),
- * 12px radius, no heavy shadow. Keeps the `GlassCard` name for backwards
- * compatibility — the glass treatment is gone but the API is unchanged.
+ * Spa-style surface card: mood-aware background, thin border, 20px radius.
  */
 export function GlassCard({
   children,
@@ -14,7 +12,7 @@ export function GlassCard({
 }) {
   return (
     <div
-      className={`bg-cream border border-cream-border rounded-xl p-4 transition-colors duration-200 ${className}`}
+      className={`spa-card p-4 transition-colors duration-300 ${className}`}
     >
       {children}
     </div>

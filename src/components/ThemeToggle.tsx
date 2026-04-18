@@ -1,26 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
-import { Moon, Sun, Palette } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
-import type { Palette as PaletteType } from '../hooks/useTheme'
+import type { Mood } from '../hooks/useTheme'
+import { MOOD_META } from '../hooks/useTheme'
+import { Check } from 'lucide-react'
 
 interface ThemeToggleProps {
   className?: string
 }
 
-const PALETTES: { id: PaletteType; label: string; swatch: string; darkSwatch: string }[] = [
-  { id: 'classic', label: 'Klassisk', swatch: '#f7f4ed', darkSwatch: '#1c1c1c' },
-  { id: 'ocean', label: 'Ocean', swatch: '#3b82f6', darkSwatch: '#60a5fa' },
-  { id: 'teal', label: 'Teal Spa', swatch: '#0f766e', darkSwatch: '#2dd4bf' },
-  { id: 'midnight', label: 'Midnight', swatch: '#818cf8', darkSwatch: '#818cf8' },
-  { id: 'emerald', label: 'Emerald', swatch: '#059669', darkSwatch: '#34d399' },
-]
+const MOOD_GRADIENTS: Record<Mood, string> = {
+  hammam: 'radial-gradient(ellipse at 30% 20%, oklch(0.80 0.06 215) 0%, oklch(0.55 0.08 225) 60%, oklch(0.35 0.06 235) 100%)',
+  terme: 'radial-gradient(ellipse at 30% 20%, oklch(0.65 0.09 225) 0%, oklch(0.40 0.10 235) 55%, oklch(0.25 0.08 245) 100%)',
+  onsen: 'radial-gradient(ellipse at 30% 20%, oklch(0.55 0.08 210) 0%, oklch(0.35 0.07 225) 55%, oklch(0.18 0.05 240) 100%)',
+}
 
 export function ThemeToggle({ className = '' }: ThemeToggleProps) {
-  const { theme, toggleTheme, palette, setPalette } = useTheme()
+  const { mood, setMood } = useTheme()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const isDark = theme === 'dark'
-  const isMidnight = palette === 'midnight'
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -35,62 +32,56 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        aria-label="Byt tema"
-        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md bg-cream border border-cream-border text-charcoal hover:bg-charcoal-hover transition-colors"
+        aria-label="Byt atmosfär"
+        className="w-[34px] h-[34px] flex items-center justify-center rounded-full bg-cream-light border border-cream-border text-charcoal transition-colors"
       >
-        <Palette size={16} strokeWidth={1.75} />
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M4.2 4.2l2.2 2.2M17.6 17.6l2.2 2.2M2 12h3M19 12h3M4.2 19.8l2.2-2.2M17.6 6.4l2.2-2.2"/>
+        </svg>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-[200px] bg-cream-light border border-cream-border rounded-xl p-3 shadow-focus-warm z-50 space-y-3">
-          {/* Light/dark toggle */}
-          {!isMidnight && (
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-[13px] text-charcoal hover:bg-charcoal-hover transition-colors"
-            >
-              {isDark ? <Sun size={15} strokeWidth={1.75} /> : <Moon size={15} strokeWidth={1.75} />}
-              <span className="font-medium tracking-tight">
-                {isDark ? 'Ljust läge' : 'Mörkt läge'}
-              </span>
-            </button>
-          )}
-
-          {!isMidnight && <div className="border-t border-cream-border" />}
-
-          {/* Palette grid */}
+        <div className="absolute right-0 top-full mt-2 w-[240px] bg-cream-light border border-cream-border rounded-[20px] p-3 shadow-focus z-50">
+          <div className="spa-label px-2 mb-2">Atmosfär</div>
           <div className="space-y-1">
-            <div className="text-[10px] text-charcoal-muted uppercase tracking-[1.5px] font-medium px-2">
-              Färgtema
-            </div>
-            {PALETTES.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setPalette(p.id)
-                  setOpen(false)
-                }}
-                className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-[13px] transition-colors ${
-                  palette === p.id
-                    ? 'bg-charcoal-hover text-charcoal font-medium'
-                    : 'text-charcoal-muted hover:bg-charcoal-hover hover:text-charcoal'
-                }`}
-              >
-                <div className="flex gap-0.5">
+            {(Object.keys(MOOD_META) as Mood[]).map((key) => {
+              const m = MOOD_META[key]
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setMood(key)
+                    setOpen(false)
+                  }}
+                  className={`w-full flex items-center gap-3 px-2 py-2.5 rounded-xl text-left transition-colors ${
+                    mood === key ? 'bg-charcoal-hover' : 'hover:bg-charcoal-hover'
+                  }`}
+                >
                   <div
-                    className="w-4 h-4 rounded-l-md border border-cream-border"
-                    style={{ backgroundColor: p.swatch }}
+                    className="w-8 h-8 rounded-full flex-shrink-0"
+                    style={{
+                      background: MOOD_GRADIENTS[key],
+                      boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.1)',
+                    }}
                   />
-                  <div
-                    className="w-4 h-4 rounded-r-md border border-cream-border"
-                    style={{ backgroundColor: p.darkSwatch }}
-                  />
-                </div>
-                <span className="tracking-tight">{p.label}</span>
-              </button>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display text-[15px] text-charcoal tracking-tight">
+                      {m.name}
+                    </div>
+                    <div className="text-[11px] text-charcoal-muted tracking-tight">
+                      {m.subtitle}
+                    </div>
+                  </div>
+                  {mood === key && (
+                    <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                      <Check size={12} className="text-cream" strokeWidth={2.5} />
+                    </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
