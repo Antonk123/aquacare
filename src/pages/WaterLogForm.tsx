@@ -16,10 +16,7 @@ interface FormField {
 const FIELDS: FormField[] = [
   { key: 'ph', label: 'pH', placeholder: '7,4' },
   { key: 'freeChlorine', label: 'Fritt klor (mg/L)', placeholder: '4,0' },
-  { key: 'bromine', label: 'Brom (mg/L)', placeholder: '5,0' },
   { key: 'totalAlkalinity', label: 'Alkalinitet (mg/L)', placeholder: '100' },
-  { key: 'calciumHardness', label: 'Kalciumhårdhet (mg/L)', placeholder: '200' },
-  { key: 'tds', label: 'TDS (mg/L)', placeholder: '800' },
   { key: 'waterTemp', label: 'Vattentemp (°C)', placeholder: '38' },
 ]
 
@@ -258,7 +255,7 @@ export default function WaterLogForm() {
                 const range = VALIDATION_RANGES[field.key]
                 const error = errors[field.key]
                 return (
-                  <div key={field.key} className={field.key === 'waterTemp' ? 'col-span-2' : ''}>
+                  <div key={field.key}>
                     <label className={LABEL_CLS}>{field.label}</label>
                     <input
                       type="text"

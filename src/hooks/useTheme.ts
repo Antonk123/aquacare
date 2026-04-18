@@ -1,20 +1,18 @@
 import { useEffect, useState, useCallback } from 'react'
 
 export type Theme = 'light' | 'dark'
+export type Palette = 'classic' | 'ocean' | 'teal' | 'midnight' | 'emerald'
 
-const STORAGE_KEY = 'aquacare_theme'
+const THEME_KEY = 'aquacare_theme'
+const PALETTE_KEY = 'aquacare_palette'
 
-/**
- * Reads the initial theme from localStorage, falling back to the user's
- * OS preference. Safe to call during SSR (returns 'light' if window missing).
- */
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') return 'light'
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(THEME_KEY)
     if (stored === 'light' || stored === 'dark') return stored
   } catch {
-    // ignore access errors (private mode, etc.)
+    // ignore
   }
   if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
     return 'dark'
@@ -22,68 +20,73 @@ function getInitialTheme(): Theme {
   return 'light'
 }
 
-/**
- * Applies the theme to <html> via data-theme attribute and updates the
- * browser chrome (theme-color meta) so status bars match.
- */
-function applyTheme(theme: Theme) {
+const VALID_PALETTES: Palette[] = ['classic', 'ocean', 'teal', 'midnight', 'emerald']
+
+function getInitialPalette(): Palette {
+  if (typeof window === 'undefined') return 'classic'
+  try {
+    const stored = localStorage.getItem(PALETTE_KEY)
+    if (stored && VALID_PALETTES.includes(stored as Palette)) return stored as Palette
+  } catch {
+    // ignore
+  }
+  return 'classic'
+}
+
+/** Theme-color meta values per palette×mode */
+const META_COLORS: Record<Palette, { light: string; dark: string }> = {
+  classic:  { light: '#f7f4ed', dark: '#171717' },
+  ocean:    { light: '#f8fafc', dark: '#0c1222' },
+  teal:     { light: '#f0fdfa', dark: '#0a1a1a' },
+  midnight: { light: '#0f0f0f', dark: '#0f0f0f' },
+  emerald:  { light: '#f0fdf4', dark: '#0a1a10' },
+}
+
+function applyTheme(theme: Theme, palette: Palette) {
   const root = document.documentElement
-  root.setAttribute('data-theme', theme)
+  // Midnight is always dark
+  const effectiveTheme = palette === 'midnight' ? 'dark' : theme
+  root.setAttribute('data-theme', effectiveTheme)
+  root.setAttribute('data-palette', palette)
 
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
   if (meta) {
-    meta.content = theme === 'dark' ? '#171717' : '#f7f4ed'
+    meta.content = META_COLORS[palette][effectiveTheme]
   }
 }
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme)
+  const [palette, setPaletteState] = useState<Palette>(getInitialPalette)
 
-  // Apply once on mount (covers the case where the initial SSR value
-  // differed from the client-side preference).
   useEffect(() => {
-    applyTheme(theme)
-  }, [theme])
+    applyTheme(theme, palette)
+  }, [theme, palette])
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next)
-    try {
-      localStorage.setItem(STORAGE_KEY, next)
-    } catch {
-      // ignore
-    }
+    try { localStorage.setItem(THEME_KEY, next) } catch { /* ignore */ }
   }, [])
 
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => {
       const next: Theme = prev === 'dark' ? 'light' : 'dark'
-      try {
-        localStorage.setItem(STORAGE_KEY, next)
-      } catch {
-        // ignore
-      }
+      try { localStorage.setItem(THEME_KEY, next) } catch { /* ignore */ }
       return next
     })
   }, [])
 
-  return { theme, setTheme, toggleTheme }
+  const setPalette = useCallback((next: Palette) => {
+    setPaletteState(next)
+    try { localStorage.setItem(PALETTE_KEY, next) } catch { /* ignore */ }
+  }, [])
+
+  return { theme, setTheme, toggleTheme, palette, setPalette }
 }
 
-/**
- * Applies the persisted theme as early as possible, before React mounts,
- * to avoid a flash of light-mode content. Call this once from main.tsx.
- */
 export function initThemeBeforeMount() {
   if (typeof window === 'undefined') return
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark') {
-      applyTheme(stored)
-      return
-    }
-  } catch {
-    // ignore
-  }
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
-  applyTheme(prefersDark ? 'dark' : 'light')
+  const theme = getInitialTheme()
+  const palette = getInitialPalette()
+  applyTheme(theme, palette)
 }

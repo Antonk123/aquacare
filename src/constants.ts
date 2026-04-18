@@ -16,20 +16,14 @@ export const DEFAULT_SETTINGS: Settings = {
 export const VALIDATION_RANGES: Record<string, { min: number; max: number; label: string }> = {
   ph: { min: 0, max: 14, label: 'pH' },
   freeChlorine: { min: 0, max: 30, label: 'Fritt klor' },
-  bromine: { min: 0, max: 30, label: 'Brom' },
   totalAlkalinity: { min: 0, max: 500, label: 'Alkalinitet' },
-  calciumHardness: { min: 0, max: 1000, label: 'Kalciumhårdhet' },
-  tds: { min: 0, max: 5000, label: 'TDS' },
   waterTemp: { min: 0, max: 50, label: 'Temperatur' },
 }
 
 export const OPTIMAL_RANGES: OptimalRange[] = [
   { label: 'pH', min: 7.2, max: 7.6, unit: '', key: 'ph' },
   { label: 'Fritt klor', min: 3, max: 5, unit: 'mg/L', key: 'freeChlorine' },
-  { label: 'Brom', min: 4, max: 6, unit: 'mg/L', key: 'bromine' },
   { label: 'Alkalinitet', min: 80, max: 120, unit: 'mg/L', key: 'totalAlkalinity' },
-  { label: 'Kalcium', min: 150, max: 250, unit: 'mg/L', key: 'calciumHardness' },
-  { label: 'TDS', max: 1500, unit: 'mg/L', key: 'tds' },
   { label: 'Temperatur', max: 40, unit: '°C', key: 'waterTemp' },
 ]
 
@@ -57,7 +51,7 @@ export const SCHEDULE_TASKS: Record<SchedulePeriod, ScheduleTask[]> = {
     { id: 'w4', name: 'Torka av spats yta', description: 'Rengör kanten och locket med fuktig trasa' },
   ],
   monthly: [
-    { id: 'm1', name: 'Testa kalciumhårdhet & TDS', description: 'Använd teststickor eller digitalt' },
+    { id: 'm1', name: 'Kontrollera vattenkvalitet', description: 'Testa pH, klor och alkalinitet' },
     { id: 'm2', name: 'Djuprengör filtret', description: 'Blötlägg i filterrengöring över natten' },
     { id: 'm3', name: 'Inspektera spalock & clips', description: 'Kontrollera barnsäkring och isolering' },
     { id: 'm4', name: 'Kontrollera UVC-lampa', description: 'Verifiera att UVC-indikatorn lyser' },

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Info, Check, AlertTriangle, Trash2, Pencil } from 'lucide-react'
 import { GlassCard } from '../components/GlassCard'
-import { ValueBadge } from '../components/ValueBadge'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal } from '../constants'
@@ -113,29 +112,22 @@ export default function WaterLog() {
         </div>
       )}
 
-      <GlassCard>
-        <div className="flex items-center gap-1.5 mb-2">
-          <Info size={14} className="text-charcoal-muted" strokeWidth={1.75} />
-          <span className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium">
-            Optimala värden
+      <div className="flex items-center gap-3 px-1 text-[11px] text-charcoal-muted">
+        <Info size={12} className="flex-shrink-0" strokeWidth={1.75} />
+        {OPTIMAL_RANGES.map((r, i) => (
+          <span key={r.key} className="tabular-nums whitespace-nowrap">
+            {r.label}{' '}
+            <span className="text-charcoal font-medium">
+              {r.min !== undefined ? formatSwedishDecimal(r.min) : ''}
+              {r.min !== undefined && r.max !== undefined ? '–' : ''}
+              {r.max !== undefined
+                ? `${r.min === undefined ? '<' : ''}${formatSwedishDecimal(r.max)}`
+                : ''}
+            </span>
+            {i < OPTIMAL_RANGES.length - 1 && <span className="ml-3 text-charcoal-line">·</span>}
           </span>
-        </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px]">
-          {OPTIMAL_RANGES.map((r) => (
-            <div key={r.key} className="flex justify-between items-baseline">
-              <span className="text-charcoal-muted">{r.label}</span>
-              <span className="text-charcoal font-medium tabular-nums">
-                {r.min !== undefined ? formatSwedishDecimal(r.min) : ''}
-                {r.min !== undefined && r.max !== undefined ? ' – ' : ''}
-                {r.max !== undefined
-                  ? `${r.min === undefined ? '< ' : ''}${formatSwedishDecimal(r.max)}`
-                  : ''}
-                {r.unit ? ` ${r.unit}` : ''}
-              </span>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
+        ))}
+      </div>
 
       <div className="text-[11px] text-charcoal-muted uppercase tracking-[1.5px] font-medium pt-1">
         Senaste loggningar
@@ -151,57 +143,59 @@ export default function WaterLog() {
             const { status, warnings } = getEntryStatus(entry)
             return (
               <GlassCard key={entry.id}>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-[13px] text-charcoal font-medium tracking-tight">{formatDate(entry.date)}</span>
                     {entry.tubName && (
                       <span className="text-[10px] bg-charcoal/5 text-charcoal-muted px-2 py-0.5 rounded-md font-medium">{entry.tubName}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    {status === 'ok' ? (
-                      <span className="inline-flex items-center gap-1 bg-status-ok/10 text-status-ok text-[10px] px-2 py-0.5 rounded-md font-medium">
-                        <Check size={10} strokeWidth={2.5} />
-                        Alla optimala
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 bg-status-alert/10 text-status-alert text-[10px] px-2 py-0.5 rounded-md font-medium">
-                        <AlertTriangle size={10} strokeWidth={2.5} />
-                        {warnings} varning{warnings > 1 ? 'ar' : ''}
-                      </span>
-                    )}
-                    <Link
-                      to={`/logg/redigera/${entry.id}`}
-                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
-                      aria-label="Redigera loggning"
-                    >
-                      <Pencil size={14} className="text-charcoal-muted" strokeWidth={1.75} />
-                    </Link>
-                    <button
-                      onClick={() => setDeleteId(entry.id)}
-                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
-                      aria-label="Ta bort loggning"
-                    >
-                      <Trash2 size={14} className="text-charcoal-muted" strokeWidth={1.75} />
-                    </button>
-                  </div>
+                  {status === 'ok' ? (
+                    <span className="inline-flex items-center gap-1 bg-status-ok/10 text-status-ok text-[10px] px-2 py-0.5 rounded-md font-medium">
+                      <Check size={10} strokeWidth={2.5} />
+                      OK
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 bg-status-alert/10 text-status-alert text-[10px] px-2 py-0.5 rounded-md font-medium">
+                      <AlertTriangle size={10} strokeWidth={2.5} />
+                      {warnings} varning{warnings > 1 ? 'ar' : ''}
+                    </span>
+                  )}
                 </div>
                 {entry.note && (
-                  <p className="text-xs text-charcoal-muted italic mb-2">{entry.note}</p>
+                  <p className="text-xs text-charcoal-muted italic mb-3">{entry.note}</p>
                 )}
-                <div className="flex flex-wrap gap-1.5">
+                <div className="grid grid-cols-4 gap-2 mb-3">
                   {OPTIMAL_RANGES.map((range) => {
                     const val = entry[range.key] as number | undefined
                     if (val === undefined) return null
+                    const s = getValueStatus(range, val)
+                    const color = s === 'ok' ? 'text-charcoal' : s === 'warn' ? 'text-status-warn' : 'text-status-error'
                     return (
-                      <ValueBadge
-                        key={range.key}
-                        label={range.label}
-                        value={val}
-                        status={getValueStatus(range, val)}
-                      />
+                      <div key={range.key} className="text-center">
+                        <div className={`text-[18px] font-semibold tabular-nums tracking-tight leading-tight ${color}`}>
+                          {formatSwedishDecimal(val)}
+                        </div>
+                        <div className="text-[10px] text-charcoal-muted mt-0.5">{range.label}</div>
+                      </div>
                     )
                   })}
+                </div>
+                <div className="flex items-center justify-end gap-1 border-t border-cream-border pt-2 -mb-1">
+                  <Link
+                    to={`/logg/redigera/${entry.id}`}
+                    className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
+                    aria-label="Redigera loggning"
+                  >
+                    <Pencil size={14} className="text-charcoal-muted" strokeWidth={1.75} />
+                  </Link>
+                  <button
+                    onClick={() => setDeleteId(entry.id)}
+                    className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md transition-colors duration-200 hover:bg-charcoal-hover active:opacity-80"
+                    aria-label="Ta bort loggning"
+                  >
+                    <Trash2 size={14} className="text-charcoal-muted" strokeWidth={1.75} />
+                  </button>
                 </div>
               </GlassCard>
             )
