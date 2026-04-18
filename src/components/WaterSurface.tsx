@@ -25,7 +25,7 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
   }, [])
 
   const W = 360
-  const H = 180
+  const H = 130
 
   const wavePath = (amp: number, freq: number, phase: number, yOffset: number) => {
     const pts: string[] = []
@@ -42,7 +42,7 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
     <div
       className="relative w-full overflow-hidden rounded-[24px]"
       style={{
-        height: 180,
+        height: 130,
         background: 'radial-gradient(ellipse at 30% 20%, var(--color-water) 0%, var(--color-accent) 60%, oklch(0.35 0.06 235) 100%)',
         boxShadow: 'inset 0 0 0 1px var(--color-cream-border), 0 1px 2px rgba(0,0,0,0.04)',
       }}
@@ -64,15 +64,15 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
             <stop offset="1" stopColor="#fff" stopOpacity="0.01"/>
           </linearGradient>
         </defs>
-        <path d={wavePath(3, 6, 0, 60)} fill="url(#w1)" />
-        <path d={wavePath(4, 4, 1.5, 90)} fill="url(#w2)" />
-        <path d={wavePath(2.5, 8, 3, 120)} fill="url(#w2)" />
+        <path d={wavePath(3, 6, 0, 40)} fill="url(#w1)" />
+        <path d={wavePath(4, 4, 1.5, 65)} fill="url(#w2)" />
+        <path d={wavePath(2.5, 8, 3, 90)} fill="url(#w2)" />
         {/* Steam dots */}
         {[0.2, 0.5, 0.8].map((x, i) => (
           <circle
             key={i}
             cx={x * W + Math.sin(t * 0.7 + i) * 8}
-            cy={30 + Math.sin(t * 0.5 + i * 1.3) * 6}
+            cy={20 + Math.sin(t * 0.5 + i * 1.3) * 5}
             r={8 + Math.sin(t + i) * 2}
             fill="#fff"
             opacity={0.08}
@@ -81,13 +81,13 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
       </svg>
 
       {/* Content overlay */}
-      <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
+      <div className="absolute inset-0 flex flex-col justify-between px-3.5 py-3 text-white">
         <div className="flex justify-between items-start">
-          <div className="spa-label !text-white/75 !text-[10px]" style={{ letterSpacing: '0.15em' }}>
-            Vattenyta · levande
+          <div className="spa-label !text-white/70 !text-[9px]" style={{ letterSpacing: '0.12em' }}>
+            Vattenyta
           </div>
           <div
-            className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-body"
+            className="px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-body"
             style={{
               background: 'rgba(255,255,255,0.18)',
               backdropFilter: 'blur(8px)',
@@ -99,12 +99,12 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
           </div>
         </div>
         <div>
-          <div className="spa-value text-[64px] leading-none" style={{ fontWeight: 300, letterSpacing: '-0.04em' }}>
+          <div className="spa-value text-[48px] leading-none" style={{ fontWeight: 300, letterSpacing: '-0.04em' }}>
             {fmt(temp, 1)}
-            <span className="text-[24px] opacity-70 ml-0.5">°C</span>
+            <span className="text-[18px] opacity-70 ml-0.5">°C</span>
           </div>
-          <div className="font-body text-[12px] opacity-70 mt-1" style={{ letterSpacing: '-0.01em' }}>
-            målvärde 38,0°C · stabil senaste 4h
+          <div className="font-body text-[11px] opacity-65 mt-0.5" style={{ letterSpacing: '-0.01em' }}>
+            målvärde 38,0°C · stabil
           </div>
         </div>
       </div>
