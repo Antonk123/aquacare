@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { TrendChart } from '../components/TrendChart'
 import { api } from '../lib/api'
-import { formatSwedishDecimal, OPTIMAL_RANGES } from '../constants'
+import { formatSwedishDecimal } from '../constants'
 import type { WaterLogEntry } from '../types'
 
 interface ReportSummary {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useWaterLog } from '../hooks/useWaterLog'
-import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal } from '../constants'
+import { OPTIMAL_RANGES, getValueStatus } from '../constants'
 import { api } from '../lib/api'
 import type { ValueStatus } from '../types'
 

@@ -1,11 +1,9 @@
 import { useEffect } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { ThemeToggle } from './ThemeToggle'
 
 function TopBar() {
-  const navigate = useNavigate()
-
   return (
     <div className="flex justify-between items-center px-4 pt-3 pb-2 safe-area-pt">
       <div

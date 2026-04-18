@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { WaterSurface } from '../components/WaterSurface'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { useSchedule } from '../hooks/useSchedule'
-import { OPTIMAL_RANGES, getValueStatus, formatSwedishDecimal, SCHEDULE_TASKS } from '../constants'
+import { OPTIMAL_RANGES, getValueStatus, SCHEDULE_TASKS } from '../constants'
 import { api } from '../lib/api'
 
 interface Tub {
