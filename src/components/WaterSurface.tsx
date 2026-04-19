@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 interface WaterSurfaceProps {
   temp?: number
   status: 'ok' | 'warn' | 'alarm'
+  onStatusClick?: () => void
 }
 
 function fmt(v: number | undefined, decimals = 1): string {
@@ -10,7 +11,7 @@ function fmt(v: number | undefined, decimals = 1): string {
   return v.toFixed(decimals).replace('.', ',')
 }
 
-export function WaterSurface({ temp, status }: WaterSurfaceProps) {
+export function WaterSurface({ temp, status, onStatusClick }: WaterSurfaceProps) {
   const [t, setT] = useState(0)
 
   useEffect(() => {
@@ -86,17 +87,39 @@ export function WaterSurface({ temp, status }: WaterSurfaceProps) {
           <div className="spa-label !text-white/70 !text-[9px]" style={{ letterSpacing: '0.12em' }}>
             Vattenyta
           </div>
-          <div
-            className="px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-body"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              backdropFilter: 'blur(8px)',
-              border: '0.5px solid rgba(255,255,255,0.3)',
-              fontWeight: 500,
-            }}
-          >
-            {statusLabel}
-          </div>
+          {onStatusClick ? (
+            <button
+              type="button"
+              onClick={onStatusClick}
+              aria-label={`${statusLabel} – visa detaljer`}
+              className="px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-body flex items-center gap-1 active:scale-95 transition-transform"
+              style={{
+                background: 'rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(8px)',
+                border: '0.5px solid rgba(255,255,255,0.3)',
+                fontWeight: 500,
+                color: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              {statusLabel}
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          ) : (
+            <div
+              className="px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-body"
+              style={{
+                background: 'rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(8px)',
+                border: '0.5px solid rgba(255,255,255,0.3)',
+                fontWeight: 500,
+              }}
+            >
+              {statusLabel}
+            </div>
+          )}
         </div>
         <div>
           <div className="spa-value text-[48px] leading-none" style={{ fontWeight: 300, letterSpacing: '-0.04em' }}>

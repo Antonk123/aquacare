@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { WaterSurface } from '../components/WaterSurface'
+import { WaterStatusDetails } from '../components/WaterStatusDetails'
 import { useWaterLog } from '../hooks/useWaterLog'
 import { useSchedule } from '../hooks/useSchedule'
-import { OPTIMAL_RANGES, getValueStatus, SCHEDULE_TASKS } from '../constants'
+import { OPTIMAL_RANGES, getValueStatus, SCHEDULE_TASKS, DEFAULT_SETTINGS } from '../constants'
 import { api } from '../lib/api'
 
 interface Tub {
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const [selectedTubId, setSelectedTubId] = useState<string>(() =>
     localStorage.getItem('aquacare_selected_tub') ?? ''
   )
+  const [showStatusDetails, setShowStatusDetails] = useState(false)
 
   function selectTub(id: string) {
     setSelectedTubId(id)
@@ -89,7 +91,19 @@ export default function Dashboard() {
       )}
 
       {/* Water surface — compact */}
-      <WaterSurface temp={latest?.waterTemp} status={overallStatus} />
+      <WaterSurface
+        temp={latest?.waterTemp}
+        status={overallStatus}
+        onStatusClick={latest ? () => setShowStatusDetails(true) : undefined}
+      />
+
+      {showStatusDetails && (
+        <WaterStatusDetails
+          latest={latest}
+          waterVolume={tubs.find((t) => t.id === selectedTubId)?.volume ?? DEFAULT_SETTINGS.waterVolume}
+          onClose={() => setShowStatusDetails(false)}
+        />
+      )}
 
       {/* Value tiles — 2×2 compact */}
       {latest && (
