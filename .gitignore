@@ -3,6 +3,8 @@ dist
 .superpowers
 .claude
 .superpowers/
+.planning/
+.remember/
 data/
 server-dist/
 .DS_Store
