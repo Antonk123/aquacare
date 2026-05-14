@@ -6,37 +6,52 @@ Professionell fleranvändarapp för badhus och spa-anläggningar. Personal kontr
 ## Teknikstack
 - **Frontend:** React 19 + TypeScript + Vite
 - **Backend:** Express 5 + SQLite (WAL-mode) + better-sqlite3
-- **Styling:** Tailwind CSS 4 (med @theme-direktiv)
+- **Styling:** Tailwind CSS 4 (@theme med oklch-tokens, mood-byte via `data-mood` på `<html>`)
 - **Routing:** React Router 7 (BrowserRouter)
 - **Auth:** PIN-kod + inbjudningslänkar, bcryptjs, token-baserade sessioner
 - **Ikoner:** Lucide React (SVG)
-- **Typsnitt:** Playfair Display (headings) + DM Sans (body)
+- **Typsnitt:** Newsreader (display, serif) + Geist (body, sans) + JetBrains Mono
+- **Dev-server:** `concurrently` startar Express (`:3000`) + Vite (`:5173`) parallellt; Vite proxar `/api` → Express
 - **Deploy:** Docker (en container, Express serverar frontend + API)
 
-## Design
-- Dark luxury: navy bakgrund (#0a1628), guld accenter (#E8C97A)
-- Glassmorphism-kort med backdrop-filter: blur(12px)
+## Design — Spa-inspired med 3 mood-paletter
+
+Designsystemet bygger på **en uppsättning semantiska tokens** (`cream`, `charcoal`, `accent`, `status-*`) som mappas om via `[data-mood="..."]` på `<html>`. Ingen JSX behöver ändras vid mood-byte; mood persisteras i `localStorage` (`aquacare_mood`).
+
+| Mood | Karaktär | Mode |
+|------|----------|------|
+| `hammam` (default) | Mineral blue, imma, eucalyptus | Light |
+| `terme` | Sand, terrakotta, djupvatten | Light |
+| `onsen` | Teak, djupvatten, guld | Dark (`color-scheme: dark`) |
+
+- Editorial typografi — serif rubriker, humanist sans i brödtext
 - Mobile-first, 44px touch targets, 48px inputs/knappar
 - Svenskt gränssnitt — decimaler med komma (7,4 inte 7.4)
 - SVG-ikoner — inga emojis
+- `WaterSurface.tsx` — animerad vattenyta (rAF) som hero på Dashboard
+- `ThemeToggle.tsx` — mood-väljare med gradient-pucks (sol-knapp i navbaren)
 
 ## Projektstruktur
 ```
 src/
-├── main.tsx, App.tsx              # Entry + routing (12+ routes)
+├── main.tsx, App.tsx              # Entry + routing (15 routes)
+├── index.css                      # @theme med oklch-tokens + [data-mood] overrides
 ├── types.ts                       # Alla TypeScript interfaces
 ├── constants.ts                   # Gränsvärden, schemauppgifter, kemikalieformler
 ├── lib/api.ts                     # Typad API-klient med auto-auth
 ├── contexts/AuthContext.tsx        # AuthProvider, useAuth, ProtectedRoute
 ├── hooks/
 │   ├── useLocalStorage.ts         # Generisk localStorage hook (bara för Settings)
+│   ├── useTheme.ts                # Mood-hantering (hammam/terme/onsen) + initThemeBeforeMount
 │   ├── useWaterLog.ts             # Vattenlogg via API + streak
 │   ├── useSchedule.ts             # Schema via API
 │   ├── useNotes.ts                # Noteringar via API
 │   └── useSettings.ts             # Lokala inställningar (localStorage)
 ├── components/
-│   ├── Layout.tsx, BottomNav.tsx   # App-skal med 5-flikar
-│   ├── GlassCard.tsx              # Glassmorphism-kort
+│   ├── Layout.tsx, BottomNav.tsx   # App-skal med 5 flikar (Idag, Vattenlogg, Underhåll, Kalkylator, Trender)
+│   ├── ThemeToggle.tsx            # Mood-väljare i navbaren
+│   ├── WaterSurface.tsx           # Animerad vattenyta (rAF) på Dashboard
+│   ├── GlassCard.tsx              # Återanvändbart kort
 │   ├── SmartStatus.tsx            # Intelligent statusbanner med dosrekommendation
 │   ├── TrendChart.tsx             # SVG trender (pH, klor, alkalinitet)
 │   ├── WaterAge.tsx               # Vattenålder per bad
@@ -44,7 +59,8 @@ src/
 │   ├── ConfirmDialog.tsx          # Bekräftelsedialog
 │   └── StatusBadge.tsx, ValueBadge.tsx, ProgressRing.tsx
 └── pages/
-    ├── Dashboard.tsx              # Hem: status per bad, trender, streak, uppgifter
+    ├── Dashboard.tsx              # Idag: status per bad, vattenyta, trender, streak, uppgifter
+    ├── More.tsx                   # Hub-sida med grid-länkar till sekundära sidor
     ├── Schedule.tsx               # 4 periodflikar, checklista
     ├── WaterLog.tsx               # Logghistorik med bad-filter
     ├── WaterLogForm.tsx           # Ny/redigera logg, teststicka, bad-väljare
@@ -82,11 +98,12 @@ server/
 | `/skapa` | Skapa anläggning | Public |
 | `/join` | Gå med via kod | Public |
 | `/login` | Logga in | Public |
-| `/` | Dashboard (Hem) | Protected |
+| `/` | Dashboard (Idag) | Protected |
 | `/schema` | Underhållsschema | Protected |
 | `/logg` | Vattenlogg | Protected |
 | `/logg/ny` | Ny loggning | Protected |
 | `/logg/redigera/:id` | Redigera loggning | Protected |
+| `/mer` | Hub-sida (More) | Protected |
 | `/kalkyl` | Kemikaliekalkylator | Protected |
 | `/noteringar` | Noteringar | Protected |
 | `/installningar` | Inställningar + admin | Protected |
